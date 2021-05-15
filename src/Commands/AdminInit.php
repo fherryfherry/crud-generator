@@ -20,6 +20,9 @@ class AdminInit
         // Publish asset
         $this->publishAssets();
 
+        // Re run migration
+        ShellProcess::run("cd ".base_path()." && ".PHP_BINARY." super migrate");
+
         // Re-Run make model
         ShellProcess::run("cd ".base_path()." && ".PHP_BINARY." super make:model");
 
