@@ -63,9 +63,9 @@ trait CommandTrait
     private function recurseCopy($src,$dst, $childFolder='') {
 
         $dir = opendir($src);
-        mkdir($dst);
+        if(!file_exists($dst)) mkdir($dst);
         if ($childFolder!='') {
-            mkdir($dst.DIRECTORY_SEPARATOR.$childFolder);
+            if(!file_exists($dst.DIRECTORY_SEPARATOR.$childFolder)) mkdir($dst.DIRECTORY_SEPARATOR.$childFolder);
 
             while(false !== ( $file = readdir($dir)) ) {
                 if (( $file != '.' ) && ( $file != '..' )) {

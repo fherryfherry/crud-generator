@@ -22,7 +22,7 @@ class AdminProfileController extends Controller
     */
     public function profile()
     {
-        if(request_is_post()) {
+        if(request_method_is_post()) {
            try {
                Validator::make(request(),[
                    "name"=>"required",
