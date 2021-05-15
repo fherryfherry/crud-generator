@@ -1,0 +1,52 @@
+<?php
+
+namespace App\Modules\Admin\Controllers;
+
+use SuperFrameworkEngine\Foundation\Controller;
+use SuperFrameworkEngine\App\UtilValidator\Validator;
+use App\Models\Users;
+use SuperFrameworkEngine\App\UtilSecurity\Hash;
+
+/**
+* @route admin/profile
+*/
+class AdminProfileController extends Controller
+{
+    public function __construct()
+    {
+        if(!admin_auth()->id()) redirect(admin_url("auth/login"));
+    }
+
+    /**
+    * @route /
+    */
+    public function profile()
+    {
+        if(request_is_post()) {
+           try {
+               Validator::make(request(),[
+                   "name"=>"required",
+                   "email"=>"required|email"
+               ]);
+               $user = Users::findById(admin_auth()->id());
+               $user->name = request_string('name');
+               $user->email = request_email('email');
+               if(request('password')) $user->password = Hash::make(request('password'));
+               $user->save();
+
+               admin_auth()->refresh($user);
+
+           } catch (\Exception $e) {
+               logging($e);
+               redirect_back(['message'=>$e->getMessage(),'type'=>'warning']);
+           }
+
+           redirect(admin_url('profile'),['message'=>'Data has been saved!','type'=>'success']);
+        }
+        $data = [];
+        $data['page_title'] = "Profile";
+        $data['page_heading'] = "Profile";
+        $data['row'] = Users::findById(admin_auth()->id());
+        return view("Admin::profile.profile",$data);
+    }
+}

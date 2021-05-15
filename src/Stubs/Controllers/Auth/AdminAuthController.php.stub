@@ -1,0 +1,46 @@
+<?php
+
+namespace App\Modules\Admin\Controllers;
+
+use SuperFrameworkEngine\Foundation\Controller;
+use SuperFrameworkEngine\App\UtilValidator\Validator;
+
+/**
+* @route admin/auth
+*/
+class AdminAuthController extends Controller
+{
+    /**
+    * @route login
+    */
+    public function login()
+    {
+        if(request_method_is_post()) {
+            try {
+                $email = request_email('email');
+                $password = request_string('password');
+
+                // Auth attempt
+                admin_auth()->attempt($email, $password);
+
+                // Redirect if success
+                redirect(admin_url('dashboard'));
+            } catch (\Exception $e) {
+                logging($e);
+                redirect_back(['message'=>'Oops '.$e->getMessage(),'type'=>'warning']);
+            }
+        }
+        $data = [];
+        $data['page_title'] = "Login";
+        return view("Admin::auth.login",$data);
+    }
+
+    /**
+     * @route logout
+     */
+    public function getLogout()
+    {
+        admin_auth()->destroy();
+        redirect(admin_url('auth/login'));
+    }
+}

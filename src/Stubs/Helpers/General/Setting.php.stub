@@ -1,0 +1,16 @@
+<?php
+
+if(!function_exists('setting')) {
+    function setting($name, $default = null)
+    {
+        if($data = cache("setting_".$name)) {
+            return $data ?: $default;
+        } else {
+            $data = \App\Repositories\SettingsRepository::findBy("name", $name);
+            if($data) {
+                cache("setting_".$name,$data->content, 3600);
+            }
+            return $data ? $data->content : $default;
+        }
+    }
+}

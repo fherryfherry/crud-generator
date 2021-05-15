@@ -541,16 +541,16 @@
         },
         {
             "name": "fherryfherry/super-framework-engine",
-            "version": "v1.0.5",
+            "version": "v1.0.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/fherryfherry/super-framework-engine.git",
-                "reference": "c244dcdf6c4bfe33a2019ad5d31b30f70d29d193"
+                "reference": "9d6afa91ca93ef52753f2f446b11e2e53bc4d046"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fherryfherry/super-framework-engine/zipball/c244dcdf6c4bfe33a2019ad5d31b30f70d29d193",
-                "reference": "c244dcdf6c4bfe33a2019ad5d31b30f70d29d193",
+                "url": "https://api.github.com/repos/fherryfherry/super-framework-engine/zipball/9d6afa91ca93ef52753f2f446b11e2e53bc4d046",
+                "reference": "9d6afa91ca93ef52753f2f446b11e2e53bc4d046",
                 "shasum": ""
             },
             "require": {
@@ -589,9 +589,9 @@
             "description": "The core of super framework",
             "support": {
                 "issues": "https://github.com/fherryfherry/super-framework-engine/issues",
-                "source": "https://github.com/fherryfherry/super-framework-engine/tree/v1.0.5"
+                "source": "https://github.com/fherryfherry/super-framework-engine/tree/v1.0.6"
             },
-            "time": "2021-05-09T18:56:10+00:00"
+            "time": "2021-05-15T17:06:09+00:00"
         },
         {
             "name": "graham-campbell/result-type",

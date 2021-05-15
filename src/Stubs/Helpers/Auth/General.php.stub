@@ -1,0 +1,32 @@
+<?php
+
+if(!function_exists('admin_auth'))
+{
+    /**
+     * Alias of admin auth class
+     * @return \App\Modules\Admin\Helpers\Auth
+     */
+    function admin_auth()
+    {
+        return (new \App\Modules\Admin\Helpers\Auth());
+    }
+}
+
+if(!function_exists('admin_url')) {
+    function admin_url($path = null)
+    {
+        return url(config('admin_path','admin').$path);
+    }
+}
+
+if(!function_exists("alert_html")) {
+    function alert_html() {
+        $message = session_flash();
+        if(isset($message)) {
+            if($message['message'] && $message['type']) {
+                return "<div class='alert alert-".$message['type']."'>".$message['message']."</div>";
+            }
+        }
+        return null;
+    }
+}

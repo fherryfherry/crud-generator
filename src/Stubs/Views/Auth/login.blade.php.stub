@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login - {{ config('app_name') }}</title>
+    <link rel="stylesheet" href="{{ asset('vendor/fherryfherry/crud_generator/css/styles.min.css')}}">
+    <link rel="stylesheet" href="{{ asset('vendor/fherryfherry/crud_generator/css/sign-in.css')}}">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net/">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<main class="form-signin">
+    <form method="post">
+        {!! csrf_input() !!}
+        <div class="text-center mb-4">
+            <img class="mb-4" src="{{ asset('vendor/fherryfherry/crud_generator/images/Logo-Square.png') }}" alt="" height="60">
+            <h1 class="h3 mb-3 fw-normal">Please sign in</h1>
+        </div>
+
+        {!! alert_html() !!}
+
+        <div class="form-group">
+            <label for="floatingInput">Email address</label>
+            <input type="email" class="form-control" name="email" required id="floatingInput" placeholder="name@example.com">
+        </div>
+        <div class="form-group">
+            <label for="floatingPassword">Password</label>
+            <input type="password" class="form-control" name="password" required id="floatingPassword" placeholder="Password">
+        </div>
+
+        <button class="w-100 btn btn-lg btn-primary" type="submit">Sign in</button>
+        <p class="mt-4 mb-2 text-muted" style="font-size: 13px">&copy; Copyright 2021. All Right Reserved</p>
+    </form>
+</main>
+
+<div class="credit">
+    <span>Foto oleh <a href="https://www.pexels.com/id-id/@asadphotography?utm_content=attributionCopyText&utm_medium=referral&utm_source=pexels" rel="nofollow" target="_blank">Asad Photo Maldives dari Pexels</a></span>
+</div>
+
+</body>
+</html>

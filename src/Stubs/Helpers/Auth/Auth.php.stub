@@ -1,0 +1,75 @@
+<?php
+
+
+namespace App\Modules\Admin\Helpers;
+
+
+use App\Models\Users;
+use SuperFrameworkEngine\App\UtilSecurity\Hash;
+
+class Auth
+{
+
+    /**
+     * @param $email
+     * @param $password
+     * @throws \Exception
+     */
+    public function attempt($email, $password)
+    {
+        if(!filter_var($email, FILTER_VALIDATE_EMAIL)) throw new \Exception("Attempt failed: email is invalid");
+
+        $data = Users::findBy("email", $email);
+        if($data && Hash::check($password, $data->password)) {
+            $this->refresh($data);
+            return true;
+        } else {
+            throw new \Exception("Email and or password is incorrect!");
+        }
+    }
+
+    public function register($name, $email, $password)
+    {
+        if(!filter_var($email, FILTER_VALIDATE_EMAIL)) throw new \Exception("Attempt failed: email is invalid");
+        $exist = Users::findBy('email', $email);
+        if($exist) throw new \Exception("The email is already exists!");
+
+        $user = new Users();
+        $user->name = $name;
+        $user->email = $email;
+        $user->password = Hash::make($password);
+        $user->save();
+    }
+
+    public function id()
+    {
+        return session('admin_id');
+    }
+
+    public function name()
+    {
+        return session('admin_name');
+    }
+
+    public function email()
+    {
+        return session('admin_email');
+    }
+
+    public function destroy()
+    {
+        session_forget("admin_id");
+        session_forget("admin_name");
+        session_forget("admin_email");
+    }
+
+    public function refresh(Users $users)
+    {
+        session([
+            'admin_id'=> $users->id,
+            'admin_name'=> $users->name,
+            'admin_email'=> $users->email
+        ]);
+    }
+
+}
