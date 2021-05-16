@@ -21,10 +21,10 @@ class AdminInit
         $this->publishAssets();
 
         // Re run migration
-        ShellProcess::run("cd ".base_path()." && ".PHP_BINARY." super migrate");
+        ShellProcess::run("cd ".base_path()." && ".PHP_BINARY." super migrate --ignore-header");
 
         // Re-Run make model
-        ShellProcess::run("cd ".base_path()." && ".PHP_BINARY." super make:model");
+        ShellProcess::run("cd ".base_path()." && ".PHP_BINARY." super make:model --ignore-header");
 
         // Prepare directories
         $this->prepareDirectories();
@@ -35,8 +35,11 @@ class AdminInit
         // Make profile
         $this->makeProfile();
 
+        // Make dashboard
+        $this->makeDashboard();
+
         // Compile
-        ShellProcess::run("cd ".base_path()." && ".PHP_BINARY." super compile");
+        ShellProcess::run("cd ".base_path()." && ".PHP_BINARY." super compile --ignore-header");
 
         $this->success("Admin area has been initialized!");
         $this->success("You can visit: /admin/auth/login");
@@ -75,6 +78,16 @@ class AdminInit
         // make profile views
         $this->makeDirectory("app/Modules/Admin/Views/profile");
         $this->copyViews("Profile","app/Modules/Admin/Views/profile");
+    }
+
+    private function makeDashboard()
+    {
+        // copy controller
+        $this->copyControllers("Dashboard","app/Modules/Admin/Controllers");
+
+        // make profile views
+        $this->makeDirectory("app/Modules/Admin/Views/dashboard");
+        $this->copyViews("Dashboard","app/Modules/Admin/Views/dashboard");
     }
 
 

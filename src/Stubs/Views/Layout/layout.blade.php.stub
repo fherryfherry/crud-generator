@@ -15,36 +15,32 @@
 <div class="d-flex" id="wrapper">
     <!-- Sidebar-->
     <div class="bg-dark border-right font-weight-bold" id="sidebar-wrapper">
-        <div class="sidebar-heading text-white">Start Bootstrap</div>
+        <div class="sidebar-heading text-white">{{ config('app_name') }}</div>
         <div class="list-group list-group-flush">
             <a class="list-group-item list-group-item-action bg-dark active" href="{{ admin_url('dashboard') }}"><i data-feather="home"></i> Dashboard</a>
-            <a class="list-group-item list-group-item-action bg-dark" href="#!"><i data-feather="grid"></i> Shortcuts</a>
-            <a class="list-group-item list-group-item-action bg-dark" href="#!"><i data-feather="grid"></i> Overview</a>
-            <a class="list-group-item list-group-item-action bg-dark" href="#!"><i data-feather="grid"></i> Events</a>
-            <a class="list-group-item list-group-item-action bg-dark" href="#!"><i data-feather="user"></i> Profile</a>
-            <a class="list-group-item list-group-item-action bg-dark" href="#!"><i data-feather="grid"></i> Status</a>
+
         </div>
     </div>
     <!-- Page Content-->
     <div id="page-content-wrapper">
         <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm border-bottom">
-            <button class="btn btn-outline-secondary" id="menu-toggle"><i data-feather="menu"></i></button> <span class="font-weight-bold h4 mt-2 ml-3">Dashboard</span>
+            <button class="btn btn-outline-secondary" id="menu-toggle"><i data-feather="menu"></i></button> <span class="font-weight-bold h4 mt-2 ml-3">{{ isset($page_heading) ? $page_heading : "Admin" }}</span>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav ml-auto mt-2 mt-lg-0">
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#!" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">User Example</a>
+                        <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#!" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{ admin_auth()->name() }}</a>
                         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
-                            <a class="dropdown-item" href="{{ admin_url('profile') }}'"><i data-feather="user"></i> Profile</a>
+                            <a class="dropdown-item" href="{{ admin_url('profile') }}"><i data-feather="user"></i> Profile</a>
                             <div class="dropdown-divider"></div>
                             <a class="dropdown-item" href="{{ url() }}"><i data-feather="globe"></i> Go To Website</a>
-                            <a class="dropdown-item" href="{{ admin_url('auth/logout') }}'"><i data-feather="log-out"></i> Logout</a>
+                            <a class="dropdown-item" href="{{ admin_url('auth/logout') }}"><i data-feather="log-out"></i> Logout</a>
                         </div>
                     </li>
                 </ul>
             </div>
         </nav>
-        <div class="container-fluid main-content">
+        <div class="container-fluid main-content pt-4">
             {!! alert_html() !!}
 
             @yield('content')

@@ -1,0 +1,27 @@
+<?php
+
+namespace App\Modules\Admin\Controllers;
+
+use SuperFrameworkEngine\Foundation\Controller;
+
+/**
+* @route admin/dashboard
+*/
+class AdminDashboardController extends Controller
+{
+    public function __construct()
+    {
+        if(!admin_auth()->id()) redirect(admin_url("auth/login"));
+    }
+
+    /**
+    * @route /
+    */
+    public function index()
+    {
+        $data = [];
+        $data['page_title'] = "Dashboard";
+        $data['page_heading'] = "Dashboard";
+        return view("Admin::dashboard.dashboard",$data);
+    }
+}
