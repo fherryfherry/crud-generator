@@ -170,7 +170,7 @@ class Crud
         $html = "";
         foreach($columns as $column) {
             $columnRead = ucwords(str_replace("_"," ",$column));
-            if(in_array($column,$except)) {
+            if(!in_array($column,$except)) {
                 $input = $this->inputHtml($column);
                 $html .= '
                 <div class="form-group">
@@ -189,8 +189,7 @@ class Crud
         $columns = (new ORM())->listColumn($table);
         $html = '';
         foreach($columns as $column) {
-            $columnRead = ucwords(str_replace("_"," ",$column));
-            if(in_array($column,$except)) {
+            if(!in_array($column,$except)) {
                 $html .= '$data->'.$column.' = request("'.$column.'");'."\n";
             }
         }
@@ -204,7 +203,7 @@ class Crud
         $html = "";
         foreach($columns as $column) {
             $columnRead = ucwords(str_replace("_"," ",$column));
-            if(in_array($column,$except)) {
+            if(!in_array($column,$except)) {
                 $html .= '<th>'.$columnRead.'</th>';
             }
         }
@@ -217,7 +216,7 @@ class Crud
         $columns = (new ORM())->listColumn($table);
         $html = "";
         foreach($columns as $column) {
-            if(in_array($column,$except)) {
+            if(!in_array($column,$except)) {
                 $html .= '<th>{{$row["'.$column.'"]}}</th>';
             }
         }
