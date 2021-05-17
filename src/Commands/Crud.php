@@ -26,9 +26,9 @@ class Crud
 
         $name = $this->getArgument($arguments, "name");
         $alias = [];
-        $alias['model'] = convert_snake_to_CamelCase($table);
+        $alias['model'] = convert_snake_to_CamelCase($table, true);
         $alias['route_class'] = $table;
-        $alias['class_name'] = convert_snake_to_CamelCase($table);
+        $alias['class_name'] = convert_snake_to_CamelCase($table, true);
         $alias['module'] = $name;
         $alias['name_field'] = $this->nameField($table);
         $alias['view'] = $table;
@@ -82,7 +82,7 @@ class Crud
 
     private function publishController(string $table, string $template)
     {
-        $className = convert_snake_to_CamelCase($table);
+        $className = convert_snake_to_CamelCase($table, true);
         $fileName = "Admin".$className."Controller.php";
         file_put_contents(base_path("app/Modules/Admin/Controllers/".$fileName), $template);
     }
@@ -228,6 +228,9 @@ class Crud
     {
         $keys = array_keys($alias);
         $values = array_values($alias);
+        foreach($values as &$value) {
+            $values = "{".$value."}";
+        }
         return str_replace($keys, $values, $template);
     }
 }
