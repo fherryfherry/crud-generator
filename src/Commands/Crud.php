@@ -229,7 +229,7 @@ class Crud
         $keys = array_keys($alias);
         $values = array_values($alias);
         foreach($values as &$value) {
-            $values = "{".$value."}";
+            $value = "{".$value."}";
         }
         return str_replace($keys, $values, $template);
     }
