@@ -1,0 +1,72 @@
+<?php
+
+namespace App\Modules\Admin\Controllers;
+
+use App\Models\Settings;
+use SuperFrameworkEngine\App\UtilFileSystem\FileSystem;
+use SuperFrameworkEngine\Foundation\Controller;
+
+/**
+ * Class Setting
+ * @route /admin/setting
+ */
+class AdminSettingsController extends Controller {
+
+    public function __construct()
+    {
+        if(!admin_auth()->id()) redirect(admin_url("auth/login"));
+    }
+
+    /**
+     * @route /
+     */
+    public function general()
+    {
+        $data = [];
+        $data['page_title'] = "General Setting";
+        $data['page_heading'] = "General Setting";
+        return view("Admin::setting.general",$data);
+    }
+
+    /**
+     * @route save
+     */
+   public function save()
+   {
+       if(request_method_is_post()) {
+           try {
+               $data = request();
+               foreach($data as $key => $value) {
+                   if($key != "_token") {
+                       $setting = Settings::findBy("name", $key);
+                       $setting = (!$setting) ? new Settings() : $setting;
+                       $setting->name = $key;
+                       $setting->content = $value;
+                       $setting->save();
+                       cache("setting_".$key, $value, 3600);
+                   }
+               }
+
+               if($_FILES) {
+                   foreach($_FILES as $key => $val) {
+                       if($val['name']) {
+                           $uploadFile = (new FileSystem())->uploadImage($key, md5(time()));
+                           $setting = Settings::findBy("name", $key);
+                           $setting = (!$setting) ? new Settings() : $setting;
+                           $setting->name = $key;
+                           $setting->content = $uploadFile;
+                           $setting->save();
+                           cache("setting_".$key, $uploadFile, 3600);
+                       }
+                   }
+               }
+
+           } catch (\Exception $e) {
+               logging($e);
+               redirect_back(['message'=>$e->getMessage(),'type'=>'warning']);
+           }
+
+           redirect_back(['message'=>'Data has been saved!','type'=>'success']);
+       }
+   }
+}

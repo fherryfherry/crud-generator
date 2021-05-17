@@ -3,8 +3,9 @@
 
 namespace App\Modules\Admin\Helpers;
 
-
+use App\Repositories\RolesRepository;
 use App\Models\Users;
+use App\Repositories\RolePermissionsRepository;
 use SuperFrameworkEngine\App\UtilSecurity\Hash;
 
 class Auth
@@ -41,6 +42,14 @@ class Auth
         $user->save();
     }
 
+    /**
+     * @return array|null
+     */
+    public function menus()
+    {
+        return RolePermissionsRepository::findAllByRole((int) $this->roleId());
+    }
+
     public function id()
     {
         return session('admin_id');
@@ -56,11 +65,22 @@ class Auth
         return session('admin_email');
     }
 
+    public function roleId()
+    {
+        return session("admin_role");
+    }
+
+    public function role()
+    {
+        return RolesRepository::findById($this->roleId());
+    }
+
     public function destroy()
     {
         session_forget("admin_id");
         session_forget("admin_name");
         session_forget("admin_email");
+        session_forget("admin_role");
     }
 
     public function refresh(Users $users)
@@ -68,7 +88,8 @@ class Auth
         session([
             'admin_id'=> $users->id,
             'admin_name'=> $users->name,
-            'admin_email'=> $users->email
+            'admin_email'=> $users->email,
+            'admin_role'=> $users->roles_id
         ]);
     }
 

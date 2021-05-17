@@ -1,0 +1,29 @@
+<?php
+
+namespace App\Models;
+
+use SuperFrameworkEngine\App\UtilModel\Model;
+
+class Users extends Model
+{
+	protected $table = "users";
+	protected $primaryKey = "id";
+
+	public $id;
+	public $created_at;
+	public $updated_at;
+	public $name;
+	public $email;
+	public $photo;
+	public $password;
+	public $roles_id;
+
+    /**
+     * @return Roles|null
+     * @throws \Exception
+     */
+	public function role()
+    {
+        return Roles::findById($this->roles_id);
+    }
+}

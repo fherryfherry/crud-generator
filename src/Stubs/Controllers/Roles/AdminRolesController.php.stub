@@ -1,0 +1,105 @@
+<?php
+
+namespace App\Modules\Admin\Controllers;
+
+use App\Models\RolePermissions;
+use App\Repositories\RolesRepository;
+use App\Repositories\UsersRepository;
+use App\Services\RolesService;
+use App\Services\UsersService;
+use SuperFrameworkEngine\Foundation\Controller;
+use SuperFrameworkEngine\App\UtilValidator\Validator;
+
+/**
+* @route admin/roles
+*/
+class AdminRolesController extends Controller
+{
+    public function __construct()
+    {
+        if(!admin_auth()->id()) redirect(admin_url("auth/login"));
+    }
+
+    /**
+     * @route /
+     */
+    public function index()
+    {
+        $data = [];
+        $data['page_title'] = "Data Roles";
+        $data['page_heading'] = "Data Roles";
+
+
+        $params = [];
+        if(request('search')) {
+            $params['roles.name like'] = '%' . request('search'). '%';
+        }
+        $data['result'] = RolesRepository::findAllByPaginate($params);
+        return view("Admin::roles.index",$data);
+    }
+
+    /**
+     * @route add
+     */
+    public function add()
+    {
+        $data = [];
+        $data['page_title'] = "Data Roles";
+        $data['page_heading'] = "Add Role";
+
+        return view("Admin::roles.form", $data);
+    }
+
+    /**
+     * @route edit/{id}
+     * @param $id
+     * @return string
+     * @throws \Exception
+     */
+    public function edit($id)
+    {
+        $data = [];
+        $data['page_title'] = "Data Roles";
+        $data['page_heading'] = "Edit Role";
+
+        $data['row'] = RolesRepository::findById($id);
+        $data['permissions'] = RolePermissions::findAllBy('roles_id', $id);
+        return view("Admin::roles.form", $data);
+    }
+
+    /**
+    * @route save
+    */
+    public function save()
+    {
+        if(request_method_is_post()) {
+           try {
+               Validator::make(request(),[
+                   "name"=>"required"
+               ]);
+
+               RolesService::saveData(request());
+
+           } catch (\Exception $e) {
+               logging($e);
+               redirect_back(['message'=>$e->getMessage(),'type'=>'warning']);
+           }
+
+           redirect(admin_url('roles'),['message'=>'Data has been saved!','type'=>'success']);
+        }
+    }
+
+
+    /**
+     * @route delete/{id}
+     * @param $id
+     */
+    public function delete($id)
+    {
+        RolesService::deleteData($id);
+
+        RolePermissions::deleteWhere("roles_id = '{$id}'");
+
+        redirect_back(['message'=>'The data has been deleted!','type'=>'success']);
+    }
+}

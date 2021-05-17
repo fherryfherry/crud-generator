@@ -18,6 +18,38 @@ trait CommandTrait
         }
     }
 
+    private function copyMigrations($to)
+    {
+        $data = glob(__DIR__.'/../Stubs/Migrations/*.php.stub');
+        foreach($data as $file) {
+            copy($file, base_path($to."/".str_replace(".stub","",basename($file))));
+        }
+    }
+
+    private function copyModels($to)
+    {
+        $data = glob(__DIR__.'/../Stubs/Models/*.php.stub');
+        foreach($data as $file) {
+            copy($file, base_path($to."/".str_replace(".stub","",basename($file))));
+        }
+    }
+
+    private function copyRepositories($to)
+    {
+        $data = glob(__DIR__.'/../Stubs/Repositories/*.php.stub');
+        foreach($data as $file) {
+            copy($file, base_path($to."/".str_replace(".stub","",basename($file))));
+        }
+    }
+
+    private function copyServices($to)
+    {
+        $data = glob(__DIR__.'/../Stubs/Services/*.php.stub');
+        foreach($data as $file) {
+            copy($file, base_path($to."/".str_replace(".stub","",basename($file))));
+        }
+    }
+
     private function copyHelpers($from,$to)
     {
         $data = glob(__DIR__.'/../Stubs/Helpers/'.$from.'/*.php.stub');

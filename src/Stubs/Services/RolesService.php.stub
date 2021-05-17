@@ -1,0 +1,56 @@
+<?php
+
+namespace App\Services;
+
+use App\Models\RolePermissions;
+use App\Models\Roles;
+use App\Repositories\RolesRepository;
+
+class RolesService extends RolesRepository
+{
+    //Todo: create your own service
+
+    public static function clearCache(int $id = null)
+    {
+        if($id) {
+            cache_forget("find_roles_by_id_".$id);
+        } else {
+            cache_tag_forget("roles");
+        }
+    }
+
+    public static function saveData(array $param)
+    {
+        if(isset($param['id']) && $param['id']) {
+            $data = Roles::findById($param['id']);
+        } else {
+            $data = new Roles();
+            if(RolesRepository::findBy("name", $param['name'])) throw new \Exception("The name can't be same!");
+        }
+
+        $data->name = $param['name'];
+        $data->save();
+
+        // Role Permission
+        RolePermissions::deleteWhere("roles_id = '".$data->id."'");
+        if(isset($param['menu']) && count($param['menu'])) {
+            foreach($param['menu'] as $menuId) {
+                $permission = new RolePermissions();
+                $permission->roles_id = $data->id;
+                $permission->admin_menus_id = $menuId;
+                $permission->save();
+            }
+        }
+
+        return $data->id;
+    }
+
+    /**
+     * @param int $id
+     * @throws \Exception
+     */
+    public static function deleteData(int $id)
+    {
+        static::query()->delete($id);
+    }
+}

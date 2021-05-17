@@ -1,0 +1,38 @@
+@extends("layout")
+@section("content")
+
+
+    <div class="row">
+        <div class="col-md-5">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">{{ $page_heading }}</h4>
+                    <p class="card-subtitle text-muted"> Complete the form data bellow:
+                    </p>
+                </div>
+                <div class="card-body">
+                    <form autocomplete="off" action="{{ admin_url('setting/save') }}" method="post">
+                        <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                        <div class="form-group">
+                            <label>Company Name</label>
+                            <input type="text" class="form-control" autofocus name="company" required value="{{ setting('company') }}">
+                        </div>
+                        <div class="form-group">
+                            <label>Address</label>
+                            <input type="text" class="form-control" name="address" value="{{ setting('address')  }}" >
+                        </div>
+                        <div class="form-group">
+                            <label>Phone</label>
+                            <input type="number" class="form-control" name="phone" value="{{ setting('phone') }}">
+                        </div>
+                        <div class="mb-3"></div>
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </form>
+                </div>
+                <!-- end card-body-->
+            </div>
+            <!-- end card -->
+        </div>
+    </div>
+
+@endsection

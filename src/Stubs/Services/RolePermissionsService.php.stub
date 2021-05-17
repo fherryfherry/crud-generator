@@ -1,0 +1,19 @@
+<?php
+
+namespace App\Services;
+
+use App\Repositories\RolePermissionsRepository;
+
+class RolePermissionsService extends RolePermissionsRepository
+{
+    //Todo: create your own service
+
+    public static function clearCache(int $rolesId = null)
+    {
+        if($rolesId) {
+            cache_forget("find_all_by_role_" . $rolesId);
+        } else {
+            cache_tag_forget("role_permissions");
+        }
+    }
+}

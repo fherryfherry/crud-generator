@@ -1,0 +1,26 @@
+<?php
+
+namespace App\Repositories;
+
+use App\Models\Roles;
+
+class RolesRepository extends Roles
+{
+    //Todo: create your own query
+
+    /**
+     * @param $id
+     * @return RolesRepository|static|null
+     * @throws \Exception
+     */
+    public static function findById($id)
+    {
+        if($data = cache("find_roles_by_id_".$id)) {
+            return new static($data);
+        } else {
+            $data = static::query()->find($id);
+            if($data) cache("find_roles_by_id_".$id, $data, 1800);
+            return new static($data);
+        }
+    }
+}

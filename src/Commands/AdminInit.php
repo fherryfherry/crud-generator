@@ -20,11 +20,17 @@ class AdminInit
         // Publish asset
         $this->publishAssets();
 
+        // Publish Migration
+        $this->publishMigration();
+
         // Re run migration
         ShellProcess::run("cd ".base_path()." && ".PHP_BINARY." super migrate --ignore-header");
 
         // Re-Run make model
         ShellProcess::run("cd ".base_path()." && ".PHP_BINARY." super make:model --ignore-header");
+
+        // Copy Repo And Model
+        $this->prepareModelAndRepository();
 
         // Prepare directories
         $this->prepareDirectories();
@@ -38,11 +44,85 @@ class AdminInit
         // Make dashboard
         $this->makeDashboard();
 
+        // Make user
+        $this->makeUser();
+
+        // Make roles
+        $this->makeRoles();
+
+        // Make menu
+        $this->makeAdminMenus();
+
+        // Make setting
+        $this->makeSetting();
+
+        // Create Dummy User
+        ShellProcess::run("cd ".base_path()." && ".PHP_BINARY." super make:user --email=\"superadmin@example.com\" --password=\"123456\" --role=\"Super Admin\" --ignore-header");
+
         // Compile
         ShellProcess::run("cd ".base_path()." && ".PHP_BINARY." super compile --ignore-header");
 
         $this->success("Admin area has been initialized!");
         $this->success("You can visit: /admin/auth/login");
+        $this->success("Email: superadmin@example.com");
+        $this->success("Password: 123456");
+    }
+
+    private function makeAdminMenus()
+    {
+        // copy controller
+        $this->copyControllers("AdminMenus","app/Modules/Admin/Controllers");
+
+        // make views
+        $this->makeDirectory("app/Modules/Admin/Views/admin_menu");
+        $this->copyViews("AdminMenus","app/Modules/Admin/Views/admin_menu");
+    }
+
+    private function makeRoles()
+    {
+        // copy controller
+        $this->copyControllers("Roles","app/Modules/Admin/Controllers");
+
+        // make views
+        $this->makeDirectory("app/Modules/Admin/Views/roles");
+        $this->copyViews("Roles","app/Modules/Admin/Views/roles");
+
+        // make super admin role
+        db("roles")->insert([
+            "name"=> "Super Admin"
+        ]);
+    }
+
+    private function makeSetting()
+    {
+        // copy controller
+        $this->copyControllers("Setting","app/Modules/Admin/Controllers");
+
+        // make views
+        $this->makeDirectory("app/Modules/Admin/Views/setting");
+        $this->copyViews("Setting","app/Modules/Admin/Views/setting");
+    }
+
+    private function makeUser()
+    {
+        // copy controller
+        $this->copyControllers("Users","app/Modules/Admin/Controllers");
+
+        // make views
+        $this->makeDirectory("app/Modules/Admin/Views/users");
+        $this->copyViews("Users","app/Modules/Admin/Views/users");
+    }
+
+    private function publishMigration()
+    {
+        $this->copyMigrations("app/Migrations/Databases");
+    }
+
+    private function prepareModelAndRepository()
+    {
+        $this->copyModels("app/Models");
+        $this->copyRepositories("app/Repositories");
+        $this->copyServices("app/Services");
     }
 
     private function prepareDirectories()
@@ -69,6 +149,8 @@ class AdminInit
         $this->makeDirectory("app/Modules/Admin/Views/auth");
         $this->copyViews("Auth","app/Modules/Admin/Views/auth");
     }
+
+
 
     private function makeProfile()
     {

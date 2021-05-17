@@ -1,0 +1,78 @@
+<?php
+
+namespace App\Services;
+
+use App\Models\AdminMenus;
+use App\Models\RolePermissions;
+use App\Models\Roles;
+use App\Repositories\AdminMenusRepository;
+
+class AdminMenusService extends AdminMenusRepository
+{
+    public static function clearCache(int $id = null)
+    {
+        if($id) {
+            cache_forget("find_admin_menu_by_id_".$id);
+        } else {
+            cache_tag_forget("admin_menus");
+        }
+    }
+
+    /**
+     * @return array|null
+     * @throws \Exception
+     */
+    public static function findAllAndSubMenus()
+    {
+        $result = AdminMenus::query()->where("parent_id = 0")->orderBy("sorting asc")->get();
+        foreach($result as &$row) {
+            $subMenus = AdminMenus::query()->where("parent_id = '".$row['id']."'")->orderBy("sorting asc")->get();
+            foreach($subMenus as &$row1) {
+                $subMenus2 = AdminMenus::query()->where("parent_id = '".$row1['id']."'")->orderBy("sorting asc")->get();
+                $row1['sub_menus'] = $subMenus2;
+            }
+            $row['sub_menus'] = $subMenus;
+        }
+        return $result;
+    }
+
+    public static function saveData(array $param)
+    {
+        if(isset($param['id']) && $param['id']) {
+            $data = AdminMenus::findById($param['id']);
+        } else {
+            $data = new AdminMenus();
+        }
+
+        $data->url = $param['url'];
+        $data->name = $param['name'];
+        $data->sorting = $param['sorting'];
+        $data->icon = $param['icon'];
+        $data->parent_id = isset($param['parent_id']) ? $param['parent_id'] : 0;
+        $data->save();
+
+        RolePermissionsService::deleteWhere("admin_menus_id = '".$data->id."'");
+        if(isset($param['role']) && is_array($param['role'])) {
+            foreach($param['role'] as $roleId) {
+                $rolePermission = new RolePermissions();
+                $rolePermission->admin_menus_id = $data->id;
+                $rolePermission->roles_id = $roleId;
+                $rolePermission->save();
+            }
+        }
+
+        RolePermissionsService::clearCache();
+
+        return $data->id;
+    }
+
+    /**
+     * @param int $id
+     * @throws \Exception
+     */
+    public static function deleteData(int $id)
+    {
+        RolePermissionsService::clearCache();
+        static::query()->delete($id);
+    }
+}

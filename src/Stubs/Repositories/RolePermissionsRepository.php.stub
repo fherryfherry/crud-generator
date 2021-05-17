@@ -1,0 +1,52 @@
+<?php
+
+namespace App\Repositories;
+
+use App\Models\AdminMenus;
+use App\Models\RolePermissions;
+
+class RolePermissionsRepository extends RolePermissions
+{
+    //Todo: create your own query
+
+    public static function findAllByRole(int $rolesId)
+    {
+        if($result = cache("find_all_menus_by_role_".$rolesId)) {
+            return $result;
+        } else {
+            $result =static::query()
+                ->join("roles on roles.id = roles_id")
+                ->join("admin_menus on admin_menus.id = admin_menus_id")
+                ->where("roles_id = '{$rolesId}'")
+                ->where("admin_menus.parent_id = 0")
+                ->select("admin_menus.*")
+                ->orderBy("sorting asc")
+                ->get();
+            foreach($result as &$row) {
+                $subMenus = static::query()
+                    ->join("roles on roles.id = roles_id")
+                    ->join("admin_menus on admin_menus.id = admin_menus_id")
+                    ->where("roles_id = '{$rolesId}'")
+                    ->where("parent_id = '".$row['id']."'")
+                    ->select("admin_menus.*")
+                    ->orderBy("sorting asc")
+                    ->get();
+                foreach($subMenus as &$row1) {
+                    $subMenus2 = static::query()
+                        ->join("roles on roles.id = roles_id")
+                        ->join("admin_menus on admin_menus.id = admin_menus_id")
+                        ->where("roles_id = '{$rolesId}'")
+                        ->where("parent_id = '".$row1['id']."'")
+                        ->select("admin_menus.*")
+                        ->orderBy("sorting asc")
+                        ->get();
+                    $row1['sub_menus'] = $subMenus2;
+                }
+                $row['sub_menus'] = $subMenus;
+            }
+
+            if($result) cache("find_all_menus_by_role_".$rolesId, $result, "role_permissions", 1800);
+            return $result;
+        }
+    }
+}

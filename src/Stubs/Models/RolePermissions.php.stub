@@ -1,0 +1,18 @@
+<?php
+
+namespace App\Models;
+
+use SuperFrameworkEngine\App\UtilModel\Model;
+
+class RolePermissions extends Model
+{
+	protected $table = "role_permissions";
+	protected $primaryKey = "id";
+
+	public $id;
+	public $roles_id;
+	public $admin_menus_id;
+
+
+
+}

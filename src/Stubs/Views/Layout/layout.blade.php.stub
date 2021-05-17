@@ -4,11 +4,12 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <title>{{ isset($page_title) ? $page_title : 'Admin' }} - {{ config('app_name') }}</title>
-    <link rel="stylesheet" href="{{ asset('vendor/fherryfherry/crud_generator/css/styles.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('vendor/fherryfherry/crud_generator/css/styles.css') }}">
     <link rel="preconnect" href="https://cdn.jsdelivr.net">
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link rel="preconnect" href="https://code.jquery.com">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap" rel="stylesheet">
+    @stack("head")
 </head>
 <body>
 
@@ -17,7 +18,40 @@
     <div class="bg-dark border-right font-weight-bold" id="sidebar-wrapper">
         <div class="sidebar-heading text-white">{{ config('app_name') }}</div>
         <div class="list-group list-group-flush">
-            <a class="list-group-item list-group-item-action bg-dark active" href="{{ admin_url('dashboard') }}"><i data-feather="home"></i> Dashboard</a>
+            <a class="list-group-item list-group-item-action bg-dark {{ request_url_is("dashboard") ? "active": null }}" href="{{ admin_url('dashboard') }}"><i data-feather="home"></i> Dashboard</a>
+
+            <!-- Automate Menu -->
+            <?php $adminMenuList = admin_auth()->menus(); ?>
+            @foreach($adminMenuList as $menu)
+                @if($menu['sub_menus'])
+                    <a onclick="showSubMenu(this)" data-toggle="0" class="list-group-item list-group-item-action bg-dark {{ request_url_is(basename($menu['url']).'*') ? 'active' : null }}" href="{{ ($menu && $menu['url'] != '#') ? admin_url($menu['url']) : '#' }}">@if($menu['icon'])<i data-feather="{{ $menu['icon'] }}"></i>@endif {{ $menu['name'] }} <span class="float-right"><i data-feather="chevron-left"></i></span></a>
+                    <ul class="sub-menu">
+                    @foreach($menu['sub_menus'] as $subMenu1)
+                        <li>
+                            @if($subMenu1['sub_menus'])
+                                <a onclick="showSubMenu(this)" data-toggle="0" class="list-group-item list-group-item-action bg-dark {{ request_url_is(basename($subMenu1['url']).'*') ? 'active' : null }}" href="{{ ($subMenu1 && $subMenu1['url'] != '#') ? admin_url($subMenu1['url']) : '#' }}">@if($subMenu1['icon'])<i data-feather="{{ $subMenu1['icon'] }}"></i>@endif {{ $subMenu1['name'] }} <span class="float-right"><i data-feather="chevron-left"></i></span></a>
+                                <ul class="sub-menu">
+                                    @foreach($subMenu1['sub_menus'] as $subMenu2)
+                                        <li><a class="list-group-item list-group-item-action bg-dark {{ request_url_is(basename($subMenu2['url']).'*') ? 'active' : null }}" href="{{ ($subMenu2 && $subMenu2['url'] != '#') ? admin_url($subMenu2['url']) : '#' }}">@if($subMenu2['icon'])<i data-feather="{{ $subMenu2['icon'] }}"></i>@endif {{ $subMenu2['name'] }}</a></li>
+                                    @endforeach
+                                </ul>
+                            @else
+                                <a class="list-group-item list-group-item-action bg-dark {{ request_url_is(basename($subMenu1['url']).'*') ? 'active' : null }}" href="{{ ($subMenu1 && $subMenu1['url'] != '#') ? admin_url($subMenu1['url']) : '#' }}">@if($subMenu1['icon'])<i data-feather="{{ $subMenu1['icon'] }}"></i>@endif {{ $subMenu1['name'] }}</a>
+                            @endif
+                        </li>
+                    @endforeach
+                    </ul>
+                @else
+                    <a class="list-group-item list-group-item-action bg-dark {{ request_url_is(basename($menu['url']).'*') ? 'active' : null }}" href="{{ ($menu && $menu['url'] != '#') ? admin_url($menu['url']) : '#' }}">@if($menu['icon'])<i data-feather="{{ $menu['icon'] }}"></i>@endif {{ $menu['name'] }}</a>
+                @endif
+            @endforeach
+
+            @if(admin_auth()->role()->name == "Super Admin")
+            <a class="list-group-item list-group-item-action bg-dark {{ request_url_is("users*") ? "active": null }}" href="{{ admin_url('users') }}"><i data-feather="users"></i> User Management</a>
+            <a class="list-group-item list-group-item-action bg-dark {{ request_url_is("roles*") ? "active": null }}" href="{{ admin_url('roles') }}"><i data-feather="archive"></i> Roles</a>
+            <a class="list-group-item list-group-item-action bg-dark {{ request_url_is("admin-menu*") ? "active": null }}" href="{{ admin_url('admin-menu') }}"><i data-feather="menu"></i> Menu Management</a>
+            <a class="list-group-item list-group-item-action bg-dark {{ request_url_is("setting*") ? "active": null }}" href="{{ admin_url('setting') }}"><i data-feather="settings"></i> Setting</a>
+            @endif
 
         </div>
     </div>
@@ -52,5 +86,6 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
 <script src="{{ asset('vendor/fherryfherry/crud_generator/js/main.js')}}"></script>
+@stack("bottom")
 </body>
 </html>

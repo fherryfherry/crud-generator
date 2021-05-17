@@ -1,0 +1,43 @@
+<?php
+
+namespace App\Services;
+
+use App\Models\Users;
+use App\Repositories\UsersRepository;
+use SuperFrameworkEngine\App\UtilSecurity\Hash;
+
+class UsersService extends UsersRepository
+{
+    public static function saveData(array $param)
+    {
+        if(isset($param['id']) && $param['id']) {
+            $user = Users::findById($param['id']);
+        } else {
+            $user = new Users();
+        }
+
+        $user->name = $param['name'];
+        $user->email = $param['email'];
+        if(isset($param['roles_id'])) $user->roles_id = $param['roles_id'];
+        if(isset($param['password'])) $user->password = Hash::make($param['password']);
+        $user->save();
+
+        if(admin_auth()->id() == $user->id) {
+            admin_auth()->refresh($user);
+        }
+
+        return $user->id;
+    }
+
+    /**
+     * @param int $id
+     * @throws \Exception
+     */
+    public static function deleteData(int $id)
+    {
+        if(admin_auth()->id() == $id) {
+            throw new \Exception("Can't delete your own user");
+        }
+        static::query()->delete($id);
+    }
+}

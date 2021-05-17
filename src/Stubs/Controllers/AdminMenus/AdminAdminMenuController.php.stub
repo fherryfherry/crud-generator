@@ -1,0 +1,133 @@
+<?php
+
+namespace App\Modules\Admin\Controllers;
+
+use App\Repositories\AdminMenusRepository;
+use App\Services\AdminMenusService;
+use SuperFrameworkEngine\Foundation\Controller;
+use SuperFrameworkEngine\App\UtilValidator\Validator;
+
+/**
+* @route admin/admin-menu
+*/
+class AdminAdminMenuController extends Controller
+{
+    public function __construct()
+    {
+        if(!admin_auth()->id()) redirect(admin_url("auth/login"));
+    }
+
+    /**
+     * @route /
+     */
+    public function index()
+    {
+        $data = [];
+        $data['page_title'] = "Data Admin Menu";
+        $data['page_heading'] = "Data Admin Menu";
+        $data['parent_id'] = 0;
+
+        $params = [];
+        if(request('search')) {
+            $params['name like'] = '%' . request('search'). '%';
+        }
+        $params['parent_id'] = 0;
+        $data['result'] = AdminMenusRepository::findAllByPaginate($params, null, 20, "sorting", "asc");
+        return view("Admin::admin_menu.index",$data);
+    }
+
+    /**
+     * @route sub/{parentId}
+     * @param $parentId
+     * @return string
+     * @throws \Exception
+     */
+    public function sub($parentId)
+    {
+        $parent = AdminMenusRepository::findById($parentId);
+
+        $data = [];
+        $data['page_title'] = "Data Admin Menu";
+        $data['page_heading'] = "Admin Menu: " . $parent->name;
+        $data['parent_id'] = $parentId;
+
+        $params = [];
+        if(request('search')) {
+            $params['name like'] = '%' . request('search'). '%';
+        }
+        $params['parent_id'] = $parentId;
+        $data['result'] = AdminMenusRepository::findAllByPaginate($params, null, 20, "sorting", "asc");
+        return view("Admin::admin_menu.index",$data);
+    }
+
+    /**
+     * @route add
+     */
+    public function add()
+    {
+        $data = [];
+        $data['page_title'] = "Data Admin Menu";
+        $data['page_heading'] = "Add Admin Menu";
+        $data['parent_id'] = request('parent_id');
+
+        return view("Admin::admin_menu.form", $data);
+    }
+
+    /**
+     * @route edit/{id}
+     * @param $id
+     * @return string
+     * @throws \Exception
+     */
+    public function edit($id)
+    {
+        $data = [];
+        $data['page_title'] = "Data Admin Menu";
+        $data['page_heading'] = "Edit Admin Menu";
+
+        $data['row'] = AdminMenusRepository::findById($id);
+        $data['parent_id'] = $data['row']->parent_id;
+        return view("Admin::admin_menu.form", $data);
+    }
+
+    /**
+    * @route save
+    */
+    public function save()
+    {
+        if(request_method_is_post()) {
+           try {
+               Validator::make(request(),[
+                   "name"=>"required",
+                   "icon"=>"required",
+                   "sorting"=>"required",
+                   "url"=>"required"
+               ]);
+
+               AdminMenusService::saveData(request());
+
+           } catch (\Exception $e) {
+               logging($e);
+               redirect_back(['message'=>$e->getMessage(),'type'=>'warning']);
+           }
+
+           if(request('ref')) {
+               redirect(base64_decode(request('ref')),['message'=>'Data has been saved!','success']);
+           } else {
+               redirect(admin_url('admin-menu'),['message'=>'Data has been saved!','type'=>'success']);
+           }
+        }
+    }
+
+
+    /**
+     * @route delete/{id}
+     * @param $id
+     */
+    public function delete($id)
+    {
+        AdminMenusService::deleteData($id);
+
+        redirect_back(['message'=>'The data has been deleted!','type'=>'success']);
+    }
+}

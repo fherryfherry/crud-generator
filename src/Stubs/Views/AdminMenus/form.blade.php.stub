@@ -1,0 +1,64 @@
+@extends("layout")
+@section("content")
+
+    <p>
+        <a href="{{ request('ref') ? base64_decode(request('ref')) : admin_url('users') }}">&laquo; Go back to list data</a>
+    </p>
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">{{ $page_heading }}</h4>
+                    <p class="card-subtitle"> Complete the form data bellow:
+                    </p>
+                </div>
+                <div class="card-body">
+                    <?php /** @var \App\Models\AdminMenus $row */ ?>
+                    <form autocomplete="off" action="{{ admin_url('admin-menu/save') }}" method="post">
+                        <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                        <input type="hidden" name="id" value="{{ isset($row) ? $row->id : null }}">
+                        <input type="hidden" name="ref" value="{{ request('ref') }}">
+                        <input type="hidden" name="parent_id" value="{{ isset($parent_id) ? $parent_id : 0 }}">
+                        <div class="form-group">
+                            <label>Name</label>
+                            <input type="text" class="form-control" autofocus name="name" required value="{{ isset($row) ? $row->name : null }}" placeholder="Enter user name">
+                        </div>
+
+                        <div class="form-group">
+                            <label>URL</label>
+                            <input type="text" class="form-control" name="url" required value="{{ isset($row) ? $row->url : null }}" placeholder="Enter user name">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Icon (Feather)</label>
+                            <input type="text" class="form-control" name="icon" required value="{{ isset($row) ? $row->icon : null }}" placeholder="Enter user name">
+                            <div class="help-block"><small>You can see cheatsheets at <a href="https://feathericons.com/" target="_blank">FeatherIcons.com</a></small></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Sorting</label>
+                            <input type="number" class="form-control" name="sorting" required value="{{ isset($row) ? $row->sorting : null }}" placeholder="Enter user name">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Role Access</label> <br>
+                            <?php
+                                $roleList = \App\Repositories\RolesRepository::findAll();
+                                $permissions = (isset($row)) ? \App\Services\RolePermissionsService::findAll() : null;
+                            ?>
+                            @foreach($roleList as $role)
+                                <input type="checkbox" {{ ($permissions && simple_collect($permissions)->whereEqual("roles_id",$role['id'])->whereEqual("admin_menus_id", $row->id)->exist()) ? "checked" : null }} name="role[]" value="{{ $role['id'] }}"> {{ $role['name'] }} &nbsp;&nbsp;
+                            @endforeach
+                        </div>
+
+                        <div class="mb-3"></div>
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </form>
+                </div>
+                <!-- end card-body-->
+            </div>
+            <!-- end card -->
+        </div>
+    </div>
+
+@endsection

@@ -1,0 +1,10 @@
+<?php
+
+namespace App\Services;
+
+use App\Repositories\SettingsRepository;
+
+class SettingsService extends SettingsRepository
+{
+    //Todo: create your own service
+}

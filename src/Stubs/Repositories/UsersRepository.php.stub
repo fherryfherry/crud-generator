@@ -1,0 +1,33 @@
+<?php
+
+namespace App\Repositories;
+
+use App\Models\Users;
+
+class UsersRepository extends Users
+{
+    //Todo: create your own query
+
+    public static function findAllByPaginate($column = null, $value = null, $limit = 10, $orderBy = "id", $orderDir = "desc")
+    {
+        $result = db(static::tableName());
+        $result->leftJoin("roles on roles.id = roles_id");
+        $result->addSelect("users.*");
+        $result->addSelectTable("roles");
+        if(is_array($column)) {
+            foreach($column as $key => $val) {
+                if(stripos($key," ") !== false) {
+                    $result->where("{$key} '{$val}'");
+                } else {
+                    $result->where("{$key} = '{$val}'");
+                }
+            }
+        } else {
+            if($column & $value) {
+                $result->where("{$column} = '{$value}'");
+            }
+        }
+        $result->orderBy("{$orderBy} {$orderDir}");
+        return $result->paginate($limit);
+    }
+}

@@ -1,0 +1,10 @@
+<?php
+
+namespace App\Repositories;
+
+use App\Models\Settings;
+
+class SettingsRepository extends Settings
+{
+    //Todo: create your own query
+}

@@ -1,0 +1,53 @@
+@extends("layout")
+@section("content")
+
+    <p>
+        <a href="{{ request('ref') ? base64_decode(request('ref')) : admin_url('users') }}">&laquo; Go back to list data</a>
+    </p>
+    <div class="row mb-5">
+        <div class="col-md-7">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">{{ $page_heading }}</h4>
+                    <p class="card-subtitle"> Complete the form data bellow:
+                    </p>
+                </div>
+                <div class="card-body">
+                    <?php /** @var \App\Models\Users $row */ ?>
+                    <form autocomplete="off" action="{{ admin_url('users/save') }}" method="post">
+                        <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                        <input type="hidden" name="id" value="{{ isset($row) ? $row->id : null }}">
+                        <div class="form-group">
+                            <label>Name</label>
+                            <input type="text" class="form-control" autofocus name="name" required value="{{ isset($row) ? $row->name : null }}" placeholder="Enter user name">
+                        </div>
+                        @if(admin_auth()->role()->name == "Super Admin")
+                        <div class="form-group">
+                            <label>Role</label>
+                            <?php $roles = \App\Repositories\RolesRepository::findAll(); ?>
+                            <select name="roles_id" required class="form-control">
+                                @foreach($roles as $role)
+                                    <option {{ isset($row) && $role['id']==$row->roles_id ? "selected": "" }} value="{{$role['id']}}">{{$role['name']}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        @endif
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" class="form-control" name="email" value="{{ isset($row) ? $row->email : null }}" placeholder="Enter user email">
+                        </div>
+                        <div class="form-group">
+                            <label>Password</label>
+                            <input type="password" class="form-control" name="password" {{ isset($row) ? null : "required" }} placeholder="{{ isset($row) ? "Please leave empty if not change" : "Please input password" }}">
+                        </div>
+                        <div class="mb-3"></div>
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </form>
+                </div>
+                <!-- end card-body-->
+            </div>
+            <!-- end card -->
+        </div>
+    </div>
+
+@endsection

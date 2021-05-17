@@ -1,0 +1,94 @@
+@extends("layout")
+@section("content")
+    @push("bottom")
+        <script>
+            function checkAll(t) {
+                let checked = $(t).prop("checked");
+                $(".menu_checkbox").prop("checked", checked);
+            }
+        </script>
+    @endpush
+    <p>
+        <a href="{{ request('ref') ? base64_decode(request('ref')) : admin_url('roles') }}">&laquo; Go back to list data</a>
+    </p>
+    <div class="row mb-4">
+        <div class="col-md-7">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">{{ $page_heading }}</h4>
+                    <p class="card-subtitle"> Complete the form data bellow:
+                    </p>
+                </div>
+                <div class="card-body">
+                    <?php /** @var \App\Models\Roles $row */ ?>
+                    <form autocomplete="off" action="{{ admin_url('roles/save') }}" method="post">
+                        <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                        <input type="hidden" name="id" value="{{ isset($row) ? $row->id : null }}">
+                        <div class="form-group">
+                            <label>Name</label>
+                            <input type="text" class="form-control" autofocus name="name" required value="{{ isset($row) ? $row->name : null }}" placeholder="Enter user name">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Menu Access</label>
+                            <table class="table table-striped table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Menu Name</th>
+                                        <th width="20%"><input onclick="checkAll(this)" type="checkbox"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php $menuList = \App\Services\AdminMenusService::findAllAndSubMenus();?>
+                                    @foreach($menuList as $menu)
+                                        <?php
+                                            $selected = null;
+                                            if(isset($permissions) && is_array($permissions) && simple_collect($permissions)->whereEqual("admin_menus_id", $menu['id'])->exist()) {
+                                                $selected = "checked";
+                                            }
+                                        ?>
+                                        <tr>
+                                            <td>{{ $menu['name'] }}</td>
+                                            <td><input type="checkbox" name="menu[]" {{ $selected }} class="menu_checkbox" value="{{ $menu['id'] }}"></td>
+                                        </tr>
+
+                                        @foreach($menu['sub_menus'] as $sub1)
+                                            <?php
+                                            $selected = null;
+                                            if(isset($permissions) && is_array($permissions) && simple_collect($permissions)->whereEqual("admin_menus_id", $sub1['id'])->exist()) {
+                                                $selected = "checked";
+                                            }
+                                            ?>
+                                            <tr>
+                                                <td>&nbsp;&nbsp;- {{$sub1['name']}}</td>
+                                                <td><input type="checkbox" name="menu[]" {{ $selected }} class="menu_checkbox" value="{{ $sub1['id'] }}"></td>
+                                            </tr>
+
+                                            @foreach($sub1['sub_menus'] as $sub2)
+                                                <?php
+                                                $selected = null;
+                                                if(isset($permissions) && is_array($permissions) && simple_collect($permissions)->whereEqual("admin_menus_id", $sub2['id'])->exist()) {
+                                                    $selected = "checked";
+                                                }
+                                                ?>
+                                                <tr>
+                                                    <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-- {{$sub2['name']}}</td>
+                                                    <td><input type="checkbox" name="menu[]" {{ $selected }} class="menu_checkbox" value="{{ $sub2['id'] }}"></td>
+                                                </tr>
+                                            @endforeach
+                                        @endforeach
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="mb-3"></div>
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </form>
+                </div>
+                <!-- end card-body-->
+            </div>
+            <!-- end card -->
+        </div>
+    </div>
+
+@endsection

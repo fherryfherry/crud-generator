@@ -1,0 +1,17 @@
+<?php
+
+namespace App\Models;
+
+use SuperFrameworkEngine\App\UtilModel\Model;
+
+class Roles extends Model
+{
+	protected $table = "roles";
+	protected $primaryKey = "id";
+
+	public $id;
+	public $name;
+
+
+
+}

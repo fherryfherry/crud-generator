@@ -1,0 +1,58 @@
+@extends("layout")
+@section("content")
+    <div class="row mb-2">
+        <div class="col-9">
+            @if(isset($parent_id) && $parent_id)
+                <a href="{{ base64_decode(request('ref')) }}" class="btn btn-sm btn-secondary"><i data-feather="arrow-left"></i> Back</a>
+            @endif
+            <a href="{{ admin_url("admin-menu/add") }}?parent_id={{isset($parent_id) ? $parent_id : 0}}&ref={{ base64_encode(get_current_url()) }}" class="btn btn-sm btn-primary"><i data-feather="plus"></i> Add Data</a>
+            {{--            <a href="#" class="btn btn-sm btn-info"><i data-feather="filter"></i> Filter Data</a>--}}
+        </div>
+        <div class="col-3">
+            <form method="get">
+                <input type="text" name="search" value="{{ request('search') }}" class="form-control form-control-sm" placeholder="Search here...">
+            </form>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title font-weight-bold">
+                Data List
+            </div>
+            <div class="card-subtitle text-muted">Show list data</div>
+        </div>
+        <div class="card-body table-responsive">
+            <table class="table table-striped">
+                <thead>
+                <tr class="bg-light">
+                    <th>Name</th>
+                    <th>Sub</th>
+                    <th>Sort</th>
+                    <th width="20%">Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach($result['data'] as $row)
+                    <?php $totalSub = \App\Repositories\AdminMenusRepository::countByParent($row['id']); ?>
+                    <tr>
+                        <td>{{ $row['name'] }}</td>
+                        <td>{{ $totalSub }}</td>
+                        <td>{{ $row['sorting'] }}</td>
+                        <td class="text-nowrap">
+                            <a href="{{ admin_url('admin-menu/sub/'.$row['id']) }}?ref={{base64_encode(get_current_url())}}" class="btn btn-sm btn-info" title="Sub Menu"><i data-feather="menu"></i></a>
+                            <a href="{{ admin_url('admin-menu/edit/'.$row['id']) }}?ref={{base64_encode(get_current_url())}}" class="btn btn-sm btn-warning"><i data-feather="edit"></i></a>
+                            <a href="{{ admin_url('admin-menu/delete/'.$row['id']) }}?ref={{base64_encode(get_current_url())}}" onclick="if(!confirm('Are you sure want to delete?')) return false" class="btn btn-sm btn-danger"><i data-feather="trash-2"></i></a>
+                        </td>
+                    </tr>
+                @endforeach
+                @if($result['total'] == 0)
+                    <tr>
+                        <td colspan="4" class="text-center">There is no data yet</td>
+                    </tr>
+                @endif
+                </tbody>
+            </table>
+            {!! $result['links'] !!}
+        </div>
+    </div>
+@endsection
