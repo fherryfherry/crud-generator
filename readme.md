@@ -20,5 +20,5 @@ $ php super admin:init
 | Command | Description |
 | ------- | ----------- |
 | admin:init | Untuk membuat halaman Admin, dijalankan pertama kali |
-| make:crud {table} | Untuk membuat CRUD module |
+| make:crud {table} --name=[module name]| Untuk membuat CRUD module |
 | make:user --email=[email] --password=[pass] | Membuat user melalui cli |
