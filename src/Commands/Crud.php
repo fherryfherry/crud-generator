@@ -227,10 +227,13 @@ class Crud
     private function replacer(array $alias, $template)
     {
         $keys = array_keys($alias);
-        $values = array_values($alias);
-        foreach($values as &$value) {
-            $value = "{".$value."}";
+        foreach($keys as $i=>$key) {
+            $keys[$i] = "{".$key."}";
         }
+        $keys = array_values($keys);
+
+        $values = array_values($alias);
+
         return str_replace($keys, $values, $template);
     }
 }
