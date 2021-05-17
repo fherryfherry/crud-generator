@@ -38,6 +38,9 @@ class Crud
         $alias['td_list'] = $this->tdList($table);
         $alias['form_group'] = $this->formGroup($table);
 
+        // Re make model
+        ShellProcess::run("cd ".base_path()." && ".PHP_BINARY." super make:model --ignore-header");
+
         // Replace Controller
         $templateController = $this->replacer($alias, $templateController);
         $this->publishController($table, $templateController);
