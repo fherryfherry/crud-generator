@@ -2,6 +2,7 @@
 
 namespace App\Modules\Admin\Controllers;
 
+use App\Models\{model};
 use App\Repositories\{model}Repository;
 use App\Services\{model}Service;
 use SuperFrameworkEngine\Foundation\Controller;
