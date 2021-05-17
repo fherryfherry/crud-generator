@@ -1,0 +1,104 @@
+<?php
+
+namespace App\Modules\Admin\Controllers;
+
+use App\Repositories\{model}Repository;
+use App\Services\{model}Service;
+use SuperFrameworkEngine\Foundation\Controller;
+use SuperFrameworkEngine\App\UtilValidator\Validator;
+
+/**
+* @route admin/{route_class}
+*/
+class Admin{class_name}Controller extends Controller
+{
+    public function __construct()
+    {
+        if(!admin_auth()->id()) redirect(admin_url("auth/login"));
+    }
+
+    /**
+     * @route /
+     */
+    public function index()
+    {
+        $data = [];
+        $data['page_title'] = "Data {module}";
+        $data['page_heading'] = "Data {module}";
+
+
+        $params = [];
+        if(request('search')) {
+            $params['{name_field} like'] = '%' . request('search'). '%';
+        }
+        $data['result'] = {model}Repository::findAllByPaginate($params);
+        return view("Admin::{view}.index",$data);
+    }
+
+    /**
+     * @route add
+     */
+    public function add()
+    {
+        $data = [];
+        $data['page_title'] = "Data {module}";
+        $data['page_heading'] = "Add {module}";
+
+        return view("Admin::{view}.form", $data);
+    }
+
+    /**
+     * @route edit/{id}
+     * @param $id
+     * @return string
+     * @throws \Exception
+     */
+    public function edit($id)
+    {
+        $data = [];
+        $data['page_title'] = "Data {module}";
+        $data['page_heading'] = "Edit {module}";
+
+        $data['row'] = {model}Repository::findById($id);
+        return view("Admin::{view}.form", $data);
+    }
+
+    /**
+    * @route save
+    */
+    public function save()
+    {
+        if(request_method_is_post()) {
+           try {
+               Validator::make(request(),{add_validate_rule});
+
+               if(request('id')) {
+                 $data = {model}::findById(request('id'));
+               } else {
+                 $data = new {model}();
+               }
+
+               {model_assign}
+               $data->save();
+
+           } catch (\Exception $e) {
+               logging($e);
+               redirect_back(['message'=>$e->getMessage(),'type'=>'warning']);
+           }
+
+           redirect(admin_url('{module_path}'),['message'=>'Data has been saved!','type'=>'success']);
+        }
+    }
+
+
+    /**
+     * @route delete/{id}
+     * @param $id
+     */
+    public function delete($id)
+    {
+        {model}::delete($id);
+
+        redirect_back(['message'=>'The data has been deleted!','type'=>'success']);
+    }
+}

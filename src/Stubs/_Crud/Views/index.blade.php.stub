@@ -1,0 +1,44 @@
+@extends("layout")
+@section("content")
+    <div class="row mb-2">
+        <div class="col-9">
+            <a href="{{ admin_url("{module_path}/add") }}" class="btn btn-sm btn-primary"><i data-feather="plus"></i> Add Data</a>
+{{--            <a href="#" class="btn btn-sm btn-info"><i data-feather="filter"></i> Filter Data</a>--}}
+        </div>
+        <div class="col-3">
+            <form method="get">
+                <input type="text" name="search" value="{{ request('search') }}" class="form-control form-control-sm" placeholder="Search here...">
+            </form>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title font-weight-bold">
+                Data List
+            </div>
+            <div class="card-subtitle text-muted">Show list data</div>
+        </div>
+        <div class="card-body table-responsive">
+            <table class="table table-striped">
+                <thead>
+                <tr class="bg-light">
+                    {th_list}
+                    <th width="20%">Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                    @foreach($result['data'] as $row)
+                    <tr>
+                        {td_list}
+                        <td class="text-nowrap">
+                            <a href="{{ admin_url('{module_path}/edit/'.$row['id']) }}?ref={{base64_encode(get_current_url())}}" class="btn btn-sm btn-warning"><i data-feather="edit"></i></a>
+                            <a href="{{ admin_url('{module_path}/delete/'.$row['id']) }}?ref={{base64_encode(get_current_url())}}" onclick="if(!confirm('Are you sure want to delete?')) return false" class="btn btn-sm btn-danger"><i data-feather="trash-2"></i></a>
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+            {!! $result['links'] !!}
+        </div>
+    </div>
+@endsection

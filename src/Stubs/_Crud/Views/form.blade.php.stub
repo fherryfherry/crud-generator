@@ -1,0 +1,33 @@
+@extends("layout")
+@section("content")
+
+    <p>
+        <a href="{{ request('ref') ? base64_decode(request('ref')) : admin_url('{module_path}') }}">&laquo; Go back to list data</a>
+    </p>
+    <div class="row mb-5">
+        <div class="col-md-7">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">{{ $page_heading }}</h4>
+                    <p class="card-subtitle"> Complete the form data bellow:
+                    </p>
+                </div>
+                <div class="card-body">
+                    <?php /** @var \App\Models\{model} $row */ ?>
+                    <form autocomplete="off" action="{{ admin_url('{module_path}/save') }}" method="post">
+                        <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                        <input type="hidden" name="id" value="{{ isset($row) ? $row->id : null }}">
+
+                        {form_group}
+
+                        <div class="mb-3"></div>
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </form>
+                </div>
+                <!-- end card-body-->
+            </div>
+            <!-- end card -->
+        </div>
+    </div>
+
+@endsection

@@ -7,6 +7,11 @@ Ini adalah library tambahan untuk php superframework.
 ```bash 
 $ composer require fherryfherry/crud-generator
 ```
+Jika kamu mengalami kendalan `platform checking` jalankan perintah yang ini:
+```bash 
+$ composer require fherryfherry/crud-generator --ignore-platform-reqs
+```
+
 Setelah melakukan instalasi, jalankan perintah berikut ini untuk menggenerasi halaman Admin Anda. 
 ```bash 
 $ php super admin:init
@@ -16,3 +21,4 @@ $ php super admin:init
 | ------- | ----------- |
 | admin:init | Untuk membuat halaman Admin, dijalankan pertama kali |
 | make:crud {table} | Untuk membuat CRUD module |
+| make:user --email=[email] --password=[pass] | Membuat user melalui cli |
