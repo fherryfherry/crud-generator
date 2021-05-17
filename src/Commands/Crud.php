@@ -123,7 +123,7 @@ class Crud
         return $word;
     }
 
-    private function inputHtml(string $column)
+    private function inputHtml(string $column, bool $focus = false)
     {
         $columnRead = ucwords(str_replace("_"," ",$column));
         $inputPassword = ['password','sandi','pin'];
@@ -134,10 +134,11 @@ class Crud
         $inputNumber = ['age','year','month','price','amount','qty','quantity'];
 
         $input = null;
+        $isFocus = $focus ? "autofocus" : "";
 
         foreach ($inputPassword as $name) {
             if(strpos($column, $name) !== false) {
-                $input = '<input type="password" id="input-'.$column.'" class="form-control" name="'.$column.'" placeholder="Please leave empty if not changed!"/>';
+                $input = '<input type="password" '.$isFocus.' id="input-'.$column.'" class="form-control" name="'.$column.'" placeholder="Please leave empty if not changed!"/>';
             }
         }
 
@@ -152,30 +153,30 @@ class Crud
 
         foreach ($inputTextArea as $name) {
             if(strpos($column, $name) !== false) {
-                $input = '<textarea id="input-'.$column.'" name="'.$column.'" class="form-control" required >{{ isset($row)?$row->'.$column.' : null }}</textarea>';
+                $input = '<textarea '.$isFocus.' id="input-'.$column.'" name="'.$column.'" class="form-control" required >{{ isset($row)?$row->'.$column.' : null }}</textarea>';
             }
         }
 
         foreach ($inputEmail as $name) {
             if(strpos($column, $name) !== false) {
-                $input = '<input type="email" id="input-'.$column.'" class="form-control" required name="'.$column.'" placeholder="Enter '.$columnRead.'" value="{{ isset($row) ? $row->'.$column.' : null }}"/>';
+                $input = '<input type="email" '.$isFocus.' id="input-'.$column.'" class="form-control" required name="'.$column.'" placeholder="Enter '.$columnRead.'" value="{{ isset($row) ? $row->'.$column.' : null }}"/>';
             }
         }
 
         foreach ($inputPhone as $name) {
             if(strpos($column, $name) !== false) {
-                $input = '<input type="number" id="input-'.$column.'" class="form-control" required name="'.$column.'" placeholder="Enter '.$columnRead.'" value="{{ isset($row) ? $row->'.$column.' : null }}"/>';
+                $input = '<input type="number" '.$isFocus.' id="input-'.$column.'" class="form-control" required name="'.$column.'" placeholder="Enter '.$columnRead.'" value="{{ isset($row) ? $row->'.$column.' : null }}"/>';
             }
         }
 
         foreach ($inputNumber as $name) {
             if(strpos($column, $name) !== false) {
-                $input = '<input type="number" id="input-'.$column.'" class="form-control" required name="'.$column.'" placeholder="Enter '.$columnRead.'" value="{{ isset($row) ? $row->'.$column.' : null }}"/>';
+                $input = '<input type="number" '.$isFocus.' id="input-'.$column.'" class="form-control" required name="'.$column.'" placeholder="Enter '.$columnRead.'" value="{{ isset($row) ? $row->'.$column.' : null }}"/>';
             }
         }
 
         if(!$input) {
-            $input = '<input type="text" id="input-'.$column.'" class="form-control" required name="'.$column.'" placeholder="Enter '.$columnRead.'" value="{{ isset($row) ? $row->'.$column.' : null }}"/>';
+            $input = '<input type="text" '.$isFocus.' id="input-'.$column.'" class="form-control" required name="'.$column.'" placeholder="Enter '.$columnRead.'" value="{{ isset($row) ? $row->'.$column.' : null }}"/>';
         }
 
         return $input;
@@ -187,16 +188,18 @@ class Crud
 
         $columns = (new ORM())->listColumn($table);
         $html = "";
+        $e = 0;
         foreach($columns as $column) {
             $columnRead = ucwords(str_replace("_"," ",$column));
             if(!in_array($column,$except)) {
-                $input = $this->inputHtml($column);
+                $input = $this->inputHtml($column, ($e==0) );
                 $html .= '
                 <div class="form-group">
                     <label for="input-'.$column.'">'.$columnRead.'</label>
                     '.$input.'
                 </div>
                 ';
+                $e++;
             }
         }
         return $html;
@@ -266,7 +269,7 @@ class Crud
         $html = "";
         foreach($columns as $column) {
             if(!in_array($column,$except)) {
-                $html .= '<th>{{$row["'.$column.'"]}}</th>';
+                $html .= '<td>{{$row["'.$column.'"]}}</td>';
             }
         }
         return $html;
