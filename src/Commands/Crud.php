@@ -37,6 +37,7 @@ class Crud
         $alias['th_list'] = $this->thList($table);
         $alias['td_list'] = $this->tdList($table);
         $alias['form_group'] = $this->formGroup($table);
+        $alias['add_validate_rule'] = $this->makeValidationRule($table);
 
         // Re make model
         ShellProcess::run("cd ".base_path()." && ".PHP_BINARY." super make:model --ignore-header");
@@ -128,18 +129,20 @@ class Crud
         $inputGender = ['gender','sex','jenis_kelamin'];
         $inputTextArea = ['isi','content','description','deskripsi'];
         $inputEmail = ['mail','email'];
+        $inputPhone = ['telp','phone','hp','handphone'];
+        $inputNumber = ['age','year','month','price','amount','qty','quantity'];
 
         $input = null;
 
         foreach ($inputPassword as $name) {
             if(strpos($column, $name) !== false) {
-                $input = '<input type="password" id="'.$column.'" class="form-control" name="'.$column.'" placeholder="Please leave empty if not changed!"/>';
+                $input = '<input type="password" id="input-'.$column.'" class="form-control" name="'.$column.'" placeholder="Please leave empty if not changed!"/>';
             }
         }
 
         foreach ($inputGender as $name) {
             if(strpos($column, $name) !== false) {
-                $input = '<select class="form-control" id="'.$column.'" name="'.$column.'" required>';
+                $input = '<select class="form-control" id="input-'.$column.'" name="'.$column.'" required>';
                 $input .= '<option {{isset($row) && $row->'.$column.'=="Male" ? "selected": "" }} value="Male">Male</option>'."\n";
                 $input .= '<option {{isset($row) && $row->'.$column.'=="Female" ? "selected": "" }} value="Female">Female</option>'."\n";
                 $input .= '</select>';
@@ -148,18 +151,30 @@ class Crud
 
         foreach ($inputTextArea as $name) {
             if(strpos($column, $name) !== false) {
-                $input = '<textarea id="'.$column.'" name="'.$column.'" class="form-control" required >{{ isset($row)?$row->'.$column.' : null }}</textarea>';
+                $input = '<textarea id="input-'.$column.'" name="'.$column.'" class="form-control" required >{{ isset($row)?$row->'.$column.' : null }}</textarea>';
             }
         }
 
         foreach ($inputEmail as $name) {
             if(strpos($column, $name) !== false) {
-                $input = '<input type="email" class="form-control" required name="'.$column.'" placeholder="Enter '.$columnRead.'" value="{{ isset($row) ? $row->'.$column.' : null }}"/>';
+                $input = '<input type="email" id="input-'.$column.'" class="form-control" required name="'.$column.'" placeholder="Enter '.$columnRead.'" value="{{ isset($row) ? $row->'.$column.' : null }}"/>';
+            }
+        }
+
+        foreach ($inputPhone as $name) {
+            if(strpos($column, $name) !== false) {
+                $input = '<input type="number" id="input-'.$column.'" class="form-control" required name="'.$column.'" placeholder="Enter '.$columnRead.'" value="{{ isset($row) ? $row->'.$column.' : null }}"/>';
+            }
+        }
+
+        foreach ($inputNumber as $name) {
+            if(strpos($column, $name) !== false) {
+                $input = '<input type="number" id="input-'.$column.'" class="form-control" required name="'.$column.'" placeholder="Enter '.$columnRead.'" value="{{ isset($row) ? $row->'.$column.' : null }}"/>';
             }
         }
 
         if(!$input) {
-            $input = '<input type="text" class="form-control" required name="'.$column.'" placeholder="Enter '.$columnRead.'" value="{{ isset($row) ? $row->'.$column.' : null }}"/>';
+            $input = '<input type="text" id="input-'.$column.'" class="form-control" required name="'.$column.'" placeholder="Enter '.$columnRead.'" value="{{ isset($row) ? $row->'.$column.' : null }}"/>';
         }
 
         return $input;
@@ -186,6 +201,19 @@ class Crud
         return $html;
     }
 
+    private function makeValidationRule(string $table)
+    {
+        $except = ['id','deleted_at','updated_at','password'];
+        $columns = (new ORM())->listColumn($table);
+        $html = [];
+        foreach($columns as $column) {
+            if(!in_array($column,$except)) {
+                $html[$column] = "required";
+            }
+        }
+        return var_min_export($html, true);
+    }
+
     private function modelAssign(string $table)
     {
         $except = ['id','deleted_at','updated_at','password'];
@@ -193,7 +221,7 @@ class Crud
         $html = '';
         foreach($columns as $column) {
             if(!in_array($column,$except)) {
-                $html .= '$data->'.$column.' = request("'.$column.'");'."\n";
+                $html .= '$data->'.$column.' = request("'.$column.'");'."\n\t\t\t\t";
             }
         }
         return $html;
