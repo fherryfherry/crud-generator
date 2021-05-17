@@ -38,6 +38,7 @@ class Crud
         $alias['td_list'] = $this->tdList($table);
         $alias['form_group'] = $this->formGroup($table);
         $alias['add_validate_rule'] = $this->makeValidationRule($table);
+        $alias['th_total'] = $this->thTotal($table);
 
         // Re make model
         ShellProcess::run("cd ".base_path()." && ".PHP_BINARY." super make:model --ignore-header");
@@ -225,6 +226,23 @@ class Crud
             }
         }
         return $html;
+    }
+
+    private function thTotal(string $table)
+    {
+        $except = ['id','deleted_at','updated_at','password'];
+        $columns = (new ORM())->listColumn($table);
+        $totalCols = 0;
+        foreach($columns as $column) {
+            if(!in_array($column,$except)) {
+                $totalCols += 1;
+            }
+        }
+
+        // Plus Action column
+        $totalCols += 1;
+
+        return $totalCols;
     }
 
     private function thList(string $table)

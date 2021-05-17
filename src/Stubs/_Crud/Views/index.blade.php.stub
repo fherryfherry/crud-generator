@@ -36,6 +36,9 @@
                         </td>
                     </tr>
                     @endforeach
+                    @if($result['total']==0)
+                    <tr><td colspan='{th_total}' class='text-center'>There is no data yet</td></tr>
+                    @endif
                 </tbody>
             </table>
             {!! $result['links'] !!}
