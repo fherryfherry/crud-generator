@@ -57,7 +57,9 @@ class AdminInit
         $this->makeSetting();
 
         // Create Dummy User
-        ShellProcess::run("cd ".base_path()." && ".PHP_BINARY." super make:user --email=\"superadmin@example.com\" --password=\"123456\" --role=\"Super Admin\" --ignore-header");
+        if(db("users")->where("name = 'superadmin' or email = 'superadmin@example.com'")->count() == 0) {
+            ShellProcess::run("cd ".base_path()." && ".PHP_BINARY." super make:user --email=\"superadmin@example.com\" --password=\"123456\" --role=\"Super Admin\" --ignore-header");
+        }
 
         // Compile
         ShellProcess::run("cd ".base_path()." && ".PHP_BINARY." super compile --ignore-header");
@@ -88,9 +90,12 @@ class AdminInit
         $this->copyViews("Roles","app/Modules/Admin/Views/roles");
 
         // make super admin role
-        db("roles")->insert([
-            "name"=> "Super Admin"
-        ]);
+        if(db("roles")->where("name = 'Super Admin'")->count() == 0) {
+            db("roles")->insert([
+                "name"=> "Super Admin"
+            ]);
+        }
+
     }
 
     private function makeSetting()
