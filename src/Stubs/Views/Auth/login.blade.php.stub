@@ -2,12 +2,13 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <title>Login - {{ config('app_name') }}</title>
     <link rel="stylesheet" href="{{ asset('vendor/fherryfherry/crud_generator/css/styles.min.css')}}">
     <link rel="stylesheet" href="{{ asset('vendor/fherryfherry/crud_generator/css/sign-in.css')}}">
     <link rel="preconnect" href="https://cdn.jsdelivr.net/">
     <link rel="preconnect" href="https://fonts.gstatic.com">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans&display=swap" rel="stylesheet">
 </head>
 <body>
 

@@ -4,19 +4,19 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <title>{{ isset($page_title) ? $page_title : 'Admin' }} - {{ config('app_name') }}</title>
-    <link rel="stylesheet" href="{{ asset('vendor/fherryfherry/crud_generator/css/styles.css') }}">
+    <link rel="stylesheet" href="{{ asset('vendor/fherryfherry/crud_generator/css/styles.min.css') }}">
     <link rel="preconnect" href="https://cdn.jsdelivr.net">
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link rel="preconnect" href="https://code.jquery.com">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans&display=swap" rel="stylesheet">
     @stack("head")
 </head>
 <body>
 
 <div class="d-flex" id="wrapper">
     <!-- Sidebar-->
-    <div class="bg-dark border-right font-weight-bold" id="sidebar-wrapper">
-        <div class="sidebar-heading text-white">{{ config('app_name') }}</div>
+    <div class="bg-dark border-right" id="sidebar-wrapper">
+        <div class="sidebar-heading text-center mb-3 text-white">{{ config('app_name') }}</div>
         <div class="list-group list-group-flush">
             <a class="list-group-item list-group-item-action bg-dark {{ request_url_is("dashboard") ? "active": null }}" href="{{ admin_url('dashboard') }}"><i data-feather="home"></i> Dashboard</a>
 
@@ -58,7 +58,7 @@
     <!-- Page Content-->
     <div id="page-content-wrapper">
         <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm border-bottom">
-            <button class="btn btn-outline-secondary" id="menu-toggle"><i data-feather="menu"></i></button> <span class="font-weight-bold h4 mt-2 ml-3">{{ isset($page_heading) ? $page_heading : "Admin" }}</span>
+            <button class="btn" id="menu-toggle"><i data-feather="menu"></i></button> <span class="h5 mt-2 ml-3">{{ isset($page_heading) ? $page_heading : "Admin" }}</span>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav ml-auto mt-2 mt-lg-0">
