@@ -57,7 +57,9 @@ class AdminInit
         $this->makeSetting();
 
         // Create Dummy User
+        $newDummyUser = false;
         if(db("users")->where("name = 'superadmin' or email = 'superadmin@example.com'")->count() == 0) {
+            $newDummyUser = true;
             ShellProcess::run("cd ".base_path()." && ".PHP_BINARY." super make:user --email=\"superadmin@example.com\" --password=\"123456\" --role=\"Super Admin\" --ignore-header");
         }
 
@@ -66,8 +68,12 @@ class AdminInit
 
         $this->success("Admin area has been initialized!");
         $this->success("You can visit: /admin/auth/login");
-        $this->success("Email: superadmin@example.com");
-        $this->success("Password: 123456");
+
+        if($newDummyUser) {
+            $this->success("Email: superadmin@example.com");
+            $this->success("Password: 123456");
+        }
+
     }
 
     private function makeAdminMenus()
