@@ -16,10 +16,9 @@ class Crud
      * @description Create table`s crud module
      * @command make:crud
      * @param $table
-     * @param mixed ...$arguments
      */
-    public function run($table,...$arguments) {
-
+    public function run($table) {
+        $arguments = func_get_args();
         $templateController = file_get_contents(__DIR__."/../Stubs/_Crud/Controllers/AdminController.php.stub");
         $templateForm = file_get_contents(__DIR__."/../Stubs/_Crud/Views/form.blade.php.stub");
         $templateIndex = file_get_contents(__DIR__."/../Stubs/_Crud/Views/index.blade.php.stub");
@@ -68,7 +67,7 @@ class Crud
     {
         // Add menu
         $menusId = db("admin_menus")->insert([
-           "name"=> $name,
+            "name"=> $name,
             "icon"=> "menu",
             "url"=> $modulePath,
             "sorting"=> db("admin_menus")->count() + 1,
@@ -110,7 +109,7 @@ class Crud
 
     private function nameField(string $table) {
         $candidates = ['name','title','no','number'];
-        $columns = (new ORM())->listColumn($table);
+        $columns = db()->listColumn($table);
         $word = "id";
         foreach ($columns as $column) {
             foreach($candidates as $candidate) {
@@ -186,7 +185,7 @@ class Crud
     {
         $except = ['id','deleted_at','updated_at','password'];
 
-        $columns = (new ORM())->listColumn($table);
+        $columns = db()->listColumn($table);
         $html = "";
         $e = 0;
         foreach($columns as $column) {
@@ -208,7 +207,7 @@ class Crud
     private function makeValidationRule(string $table)
     {
         $except = ['id','deleted_at','updated_at','password'];
-        $columns = (new ORM())->listColumn($table);
+        $columns = db()->listColumn($table);
         $html = [];
         foreach($columns as $column) {
             if(!in_array($column,$except)) {
@@ -221,7 +220,7 @@ class Crud
     private function modelAssign(string $table)
     {
         $except = ['id','deleted_at','updated_at','password'];
-        $columns = (new ORM())->listColumn($table);
+        $columns = db()->listColumn($table);
         $html = '';
         foreach($columns as $column) {
             if(!in_array($column,$except)) {
@@ -234,7 +233,7 @@ class Crud
     private function thTotal(string $table)
     {
         $except = ['id','deleted_at','updated_at','password'];
-        $columns = (new ORM())->listColumn($table);
+        $columns = db()->listColumn($table);
         $totalCols = 0;
         foreach($columns as $column) {
             if(!in_array($column,$except)) {
@@ -251,7 +250,7 @@ class Crud
     private function thList(string $table)
     {
         $except = ['id','deleted_at','updated_at','password'];
-        $columns = (new ORM())->listColumn($table);
+        $columns = db()->listColumn($table);
         $html = "";
         foreach($columns as $column) {
             $columnRead = ucwords(str_replace("_"," ",$column));
@@ -265,7 +264,7 @@ class Crud
     private function tdList(string $table)
     {
         $except = ['id','deleted_at','updated_at','password'];
-        $columns = (new ORM())->listColumn($table);
+        $columns = db()->listColumn($table);
         $html = "";
         foreach($columns as $column) {
             if(!in_array($column,$except)) {
