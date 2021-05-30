@@ -1,6 +1,34 @@
 @extends('layout')
 @section('content')
-    <h1>Dashboard</h1>
+    <div class="row mb-4">
+        <div class="col-6 mb-3 col-md-3">
+            <div class="box-stat box-stat-red">
+                <div class="counter">1,674</div>
+                <div class="label">Today Visit</div>
+            </div>
+        </div>
+
+        <div class="col-6 mb-3 col-md-3">
+            <div class="box-stat box-stat-yellow">
+                <div class="counter">2,200</div>
+                <div class="label">Yesterday</div>
+            </div>
+        </div>
+
+        <div class="col-6 mb-3 col-md-3">
+            <div class="box-stat box-stat-blue">
+                <div class="counter">45,889</div>
+                <div class="label">This Month</div>
+            </div>
+        </div>
+
+        <div class="col-6 mb-3 col-md-3">
+            <div class="box-stat box-stat-violet">
+                <div class="counter">0</div>
+                <div class="label">Last Month</div>
+            </div>
+        </div>
+    </div>
     <p>The starting state of the menu will appear collapsed on smaller screens, and will appear non-collapsed on larger screens. When toggled using the button below, the menu will change.</p>
     <p>
         Make sure to keep all page content within the
