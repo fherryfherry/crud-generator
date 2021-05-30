@@ -29,48 +29,44 @@
             </div>
         </div>
     </div>
-    <p>The starting state of the menu will appear collapsed on smaller screens, and will appear non-collapsed on larger screens. When toggled using the button below, the menu will change.</p>
-    <p>
-        Make sure to keep all page content within the
-        <code>#page-content-wrapper</code>
-        . The top navbar is optional, and just for demonstration. Just create an element with the
-        <code>#menu-toggle</code>
-        ID which will toggle the menu when clicked.
-    </p>
-    <table class="table table-striped table-bordered shadow-sm">
-        <thead>
-            <tr class="active">
-                <th>No</th>
-                <th>Column1</th>
-                <th>Column2</th>
-                <th>Column3</th>
-            </tr>
-        </thead>
+
+    <div id="chart" class="mb-4">
+        <canvas id="myChart"></canvas>
+    </div>
+
+    <table class="table table-bordered table-striped" style="background: #ffffff; box-shadow: 0px 0px 5px #dddddd">
         <tbody>
-            <tr>
-                <td>1</td>
-                <td>Lorem</td>
-                <td>Ipsum</td>
-                <td>Dolor</td>
-            </tr>
-            <tr>
-                <td>1</td>
-                <td>Lorem</td>
-                <td>Ipsum</td>
-                <td>Dolor</td>
-            </tr>
-            <tr>
-                <td>1</td>
-                <td>Lorem</td>
-                <td>Ipsum</td>
-                <td>Dolor</td>
-            </tr>
-            <tr>
-                <td>1</td>
-                <td>Lorem</td>
-                <td>Ipsum</td>
-                <td>Dolor</td>
-            </tr>
+        <tr><th colspan="2"><i class="feather-info"></i> System Detail</th></tr>
+        <tr><th width="20%">Cronjob Command</th><td><code>* * * * * cd {{ base_path() }} && vendor/bin/crunz schedule:run</code></td></tr>
+        <tr><th width="20%">Your PHP Version</th><td>{{ phpversion() }}</td></tr>
+        <tr><th width="20%">OS Name</th><td>{{ PHP_OS }}</td></tr>
+        <tr><th width="20%">CPU Usage</th><td>{{ get_cpu() }}%</td></tr>
+        <tr><th width="20%">RAM Usage</th><td>{{ get_ram() }}%</td></tr>
         </tbody>
     </table>
+
+    @push("bottom")
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.2.0/chart.min.js" integrity="sha512-VMsZqo0ar06BMtg0tPsdgRADvl0kDHpTbugCBBrL55KmucH6hP9zWdLIWY//OTfMnzz6xWQRxQqsUFefwHuHyg==" crossorigin="anonymous"></script>
+        <script>
+            const labels = ["09 May","10 May","11 May","12 May","13 May","14 May","15 May","16 May","17 May","18 May","19 May","20 May","21 May","22 May","23 May","24 May","25 May","26 May","27 May","28 May","29 May","30 May"];
+            const data = {
+                labels: labels,
+                datasets: [{
+                    label: 'Visitor',
+                    backgroundColor: 'rgb(255, 99, 132)',
+                    borderColor: 'rgb(255, 99, 132)',
+                    data: [1693,3289,1855,2193,1962,1844,3550,3041,1866,1582,1682,2046,2286,2062,1851,1890,1734,1737,1871,1981,2200,1680],
+                }]
+            };
+            const config = {
+                type: 'line',
+                data,
+                options: {}
+            };
+            var myChart = new Chart(
+                document.getElementById('myChart'),
+                config
+            );
+        </script>
+    @endpush
 @endsection
