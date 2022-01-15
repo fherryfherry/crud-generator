@@ -19,7 +19,10 @@ if(!function_exists("get_ram")) {
         $mem = explode(" ", $free_arr[1]);
         $mem = array_filter($mem);
         $mem = array_merge($mem);
-        $memory_usage = $mem[2]/$mem[1]*100;
+        $memory_usage = 0;
+        if ($mem && is_array($mem) && isset($mem[2]) && isset($mem[1])) {
+            $memory_usage = $mem[2]/$mem[1]*100;
+        }
         return $memory_usage;
     }
 }
