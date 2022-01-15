@@ -17,10 +17,13 @@ class RolesRepository extends Roles
     {
         if($data = cache("find_roles_by_id_".$id)) {
             return new static($data);
-        } else {
-            $data = static::query()->find($id);
-            if($data) cache("find_roles_by_id_".$id, $data, 1800);
+        }
+
+        $data = static::query()->find($id);
+        if($data) {
+            cache("find_roles_by_id_".$id, $data, 1800);
             return new static($data);
         }
+        return new static();
     }
 }
