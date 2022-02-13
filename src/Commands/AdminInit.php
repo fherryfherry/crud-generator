@@ -29,11 +29,11 @@ class AdminInit
         // Re-Run make model
         ShellProcess::run("cd ".base_path()." && ".PHP_BINARY." super make:model --ignore-header");
 
-        // Copy Repo And Model
-        $this->prepareModelAndRepository();
-
         // Prepare directories
         $this->prepareDirectories();
+
+        // Copy Repo And Model
+        $this->prepareModelAndRepository();
 
         // Make Admin auth module
         $this->makeAuth();
@@ -139,6 +139,9 @@ class AdminInit
     private function prepareDirectories()
     {
         // Prepare directories
+        $this->makeDirectory("app/Models");
+        $this->makeDirectory("app/Repositories");
+        $this->makeDirectory("app/Services");
         $this->makeDirectory("app/Modules/Admin");
         $this->makeDirectory("app/Modules/Admin/Configs");
         $this->makeDirectory("app/Modules/Admin/Controllers");
