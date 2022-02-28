@@ -24,6 +24,10 @@ class Crud
         $templateIndex = file_get_contents(__DIR__."/../Stubs/_Crud/Views/index.blade.php.stub");
 
         $name = $this->getArgument($arguments, "name");
+        if(!$name) {
+            $this->warning("Argument --name is required");
+            return false;
+        }
         $alias = [];
         $alias['model'] = convert_snake_to_CamelCase($table, true);
         $alias['route_class'] = $table;
