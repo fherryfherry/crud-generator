@@ -3,7 +3,6 @@
 
 namespace CrudGenerator\Commands;
 
-use SuperFrameworkEngine\App\UtilORM\ORM;
 use SuperFrameworkEngine\Commands\CommandArguments;
 use SuperFrameworkEngine\Commands\OutputMessage;
 use SuperFrameworkEngine\Helpers\ShellProcess;
@@ -135,9 +134,27 @@ class Crud
         $inputEmail = ['mail','email'];
         $inputPhone = ['telp','phone','hp','handphone'];
         $inputNumber = ['age','year','month','price','amount','qty','quantity'];
+        $inputUpload = ['upload','file','attachment','download','lampiran','document'];
+        $inputImage = ['image','photo','foto','gambar','icon','logo','picture','pict'];
 
         $input = null;
         $isFocus = $focus ? "autofocus" : "";
+
+        foreach($inputImage as $name) {
+            if(strpos($column, $name) !== false) {
+                $input .= "\n".'<p>{!! show_image_html($row->'.$column.') !!}</p>';
+                $input .= "\n".'<input type="file" accept=".jpg,.jpeg,.png,.gif" id="input-'.$column.'" class="form-control" name="'.$column.'"/>';
+                $input .= "\n".'<div class="help-block">Format file allowed only: jpg,jpeg,png,gif</div>';
+            }
+        }
+
+        foreach($inputUpload as $name) {
+            if(strpos($column, $name) !== false) {
+                $input .= "\n".'<p>{!! show_downloadable_link($row->'.$column.') !!}</p>';
+                $input .= '<input type="file" accept=".jpg,.jpeg,.png,.gif,.zip,.rar,.doc,.docx,.xls,.xlsx" id="input-'.$column.'" class="form-control" name="'.$column.'"/>';
+                $input .= "\n".'<div class="help-block">Format file allowed only: jpg,png,gif,zip,rar,doc,docx,xls,xlsx</div>';
+            }
+        }
 
         foreach ($inputPassword as $name) {
             if(strpos($column, $name) !== false) {
@@ -174,7 +191,7 @@ class Crud
 
         foreach ($inputNumber as $name) {
             if(strpos($column, $name) !== false) {
-                $input = '<input type="number" '.$isFocus.' id="input-'.$column.'" class="form-control" required name="'.$column.'" placeholder="Enter '.$columnRead.'" value="{{ isset($row) ? $row->'.$column.' : null }}"/>';
+                $input = '<input type="number" '.$isFocus.' min="0" id="input-'.$column.'" class="form-control" required name="'.$column.'" placeholder="Enter '.$columnRead.'" value="{{ isset($row) ? $row->'.$column.' : null }}"/>';
             }
         }
 
@@ -187,7 +204,7 @@ class Crud
 
     private function formGroup(string $table)
     {
-        $except = ['id','deleted_at','updated_at','password'];
+        $except = ['id','created_at','deleted_at','updated_at','password'];
 
         $columns = db()->listColumn($table);
         $html = "";
@@ -210,7 +227,7 @@ class Crud
 
     private function makeValidationRule(string $table)
     {
-        $except = ['id','deleted_at','updated_at','password'];
+        $except = ['id','created_at','deleted_at','updated_at','password'];
         $columns = db()->listColumn($table);
         $html = [];
         foreach($columns as $column) {
@@ -259,7 +276,7 @@ class Crud
         foreach($columns as $column) {
             $columnRead = ucwords(str_replace("_"," ",$column));
             if(!in_array($column,$except)) {
-                $html .= '<th>'.$columnRead.'</th>';
+                $html .= "\n".'<th>'.$columnRead.'</th>';
             }
         }
         return $html;
@@ -272,7 +289,7 @@ class Crud
         $html = "";
         foreach($columns as $column) {
             if(!in_array($column,$except)) {
-                $html .= '<td>{{$row["'.$column.'"]}}</td>';
+                $html .= "\td".'<td>{{$row["'.$column.'"]}}</td>';
             }
         }
         return $html;
