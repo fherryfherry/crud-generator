@@ -15,8 +15,9 @@ class Crud
      * @description Create table`s crud module
      * @command make:crud
      * @param $table
+     * @param null $moduleName
      */
-    public function run($table) {
+    public function run($table, $moduleName = null) {
         $arguments = func_get_args();
         $templateController = file_get_contents(__DIR__."/../Stubs/_Crud/Controllers/AdminController.php.stub");
         $templateForm = file_get_contents(__DIR__."/../Stubs/_Crud/Views/form.blade.php.stub");
@@ -27,6 +28,8 @@ class Crud
             $this->warning("Argument --name is required");
             return false;
         }
+        $name = ($moduleName) ?: $name;
+
         $alias = [];
         $alias['model'] = convert_snake_to_CamelCase($table, true);
         $alias['route_class'] = $table;
