@@ -10034,6 +10034,7 @@ a.text-dark:hover, a.text-dark:focus {
   display: none;
   list-style-type: none;
   padding-left: 15px;
+  margin-bottom: 0px;
 }
 
 .box-stat-red {
