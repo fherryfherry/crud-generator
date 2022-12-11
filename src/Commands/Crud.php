@@ -292,7 +292,7 @@ class Crud
         $html = "";
         foreach($columns as $column) {
             if(!in_array($column,$except)) {
-                $html .= "\td".'<td>{{$row["'.$column.'"]}}</td>';
+                $html .= "\t".'<td>{{$row["'.$column.'"]}}</td>'."\n";
             }
         }
         return $html;
