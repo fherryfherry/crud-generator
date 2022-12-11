@@ -1,5 +1,24 @@
 <?php
 
+if(!function_exists('show_image_html')) {
+    function show_image_html($urlImage,$width="150px",$height="auto",$class="",$style="") {
+        if($urlImage) {
+            return "<img src='".$urlImage."' width='".$width."' height='".$height."' class='".$class."' style='".$style."'/>";
+        }
+        return null;
+    }
+}
+
+if(!function_exists('show_downloadable_link')) {
+    function show_downloadable_link($url,$label="",$target="_blank",$class="",$style="") {
+        if($url) {
+            $label = $label ?: basename($url);
+            return "<a href='".$url."' class='".$class."' target='".$target."' style='".$style."'>".$label."</a>";
+        }
+        return null;
+    }
+}
+
 if(!function_exists("get_cpu")) {
     function get_cpu(){
         if(function_exists("sys_getloadavg")) {
