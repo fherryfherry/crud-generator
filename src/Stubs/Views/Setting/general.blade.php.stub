@@ -11,11 +11,15 @@
                     </p>
                 </div>
                 <div class="card-body">
-                    <form autocomplete="off" action="{{ admin_url('setting/save') }}" method="post">
+                    <form autocomplete="off" enctype="multipart/form-data" action="{{ admin_url('setting/save') }}" method="post">
                         <input type="hidden" name="_token" value="{{ csrf_token() }}">
                         <div class="form-group">
+                            <label>Application Name</label>
+                            <input type="text" class="form-control" autofocus name="app_name" required value="{{ setting('app_name') }}">
+                        </div>
+                        <div class="form-group">
                             <label>Company Name</label>
-                            <input type="text" class="form-control" autofocus name="company" required value="{{ setting('company') }}">
+                            <input type="text" class="form-control" name="company" value="{{ setting('company') }}">
                         </div>
                         <div class="form-group">
                             <label>Address</label>
@@ -24,6 +28,34 @@
                         <div class="form-group">
                             <label>Phone</label>
                             <input type="number" class="form-control" name="phone" value="{{ setting('phone') }}">
+                        </div>
+                        <hr>
+                        <div class="form-group">
+                            <label>Logo Login</label>
+                            @if($logo = setting('logo_login'))
+                                <p><img src="{{ asset(setting('logo_login')) }}" width="250px" alt=""></p>
+                                <p><a href="{{admin_url("setting/remove/logo_login")}}" title="Remove"><i data-feather="trash-2"></i></a></p>
+                            @endif
+                            <input type="file" name="logo_login" class="form-control">
+                            <div><small>File format: png (bg transparent)</small></div>
+                        </div>
+                        <div class="form-group">
+                            <label>Background Login</label>
+                            @if($logo = setting('background_login'))
+                                <p><img src="{{ asset(setting('background_login')) }}" width="250px"></p>
+                                <p><a href="{{admin_url("setting/remove/background_login")}}" title="Remove"><i data-feather="trash-2"></i></a></p>
+                            @endif
+                            <input type="file" name="background_login" class="form-control">
+                            <div><small>File format: png, jpg, jpeg</small></div>
+                        </div>
+                        <div class="form-group">
+                            <label>Background Theme</label>
+                            @if($logo = setting('background_layout'))
+                                <p><img src="{{ asset(setting('background_layout')) }}" width="250px"></p>
+                                <p><a href="{{admin_url("setting/remove/background_layout")}}" title="Remove"><i data-feather="trash-2"></i></a></p>
+                            @endif
+                            <input type="file" name="background_layout" class="form-control">
+                            <div><small>File format: png, jpg, jpeg</small></div>
                         </div>
                         <div class="mb-3"></div>
                         <button type="submit" class="btn btn-primary">Save</button>
