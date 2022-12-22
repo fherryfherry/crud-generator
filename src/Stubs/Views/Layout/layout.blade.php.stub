@@ -9,6 +9,14 @@
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link rel="preconnect" href="https://code.jquery.com">
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans&display=swap" rel="stylesheet">
+     <style>
+            @if($bg = setting("background_layout"))
+            #page-content-wrapper {
+                background: #fff url("{{ asset($bg) }}");
+                background-size: cover;
+            }
+            @endif
+        </style>
     @stack("head")
 </head>
 <body>
@@ -18,6 +26,8 @@
     <div class="bg-dark border-right" id="sidebar-wrapper">
         <div class="sidebar-heading text-center mb-3 text-white">{{ config('app_name') }}</div>
         <div class="list-group list-group-flush">
+            <a class="list-group-item list-group-item-action bg-dark list-header" href="javascript:;">
+                        <i data-feather="globe"></i> Navigation</a>
             <a class="list-group-item list-group-item-action bg-dark {{ request_url_is("dashboard") ? "active": null }}" href="{{ admin_url('dashboard') }}"><i data-feather="home"></i> Dashboard</a>
 
             <!-- Automate Menu -->
@@ -47,6 +57,8 @@
             @endforeach
 
             @if(admin_auth()->role()->name == "Super Admin")
+            <a class="list-group-item list-group-item-action bg-dark" href="javascript:;" style="font-weight: bold; border-bottom: 1px dotted #555; margin-top: 30px;">
+                                <i data-feather="layers"></i> SuperAdmin Menu</a>
             <a class="list-group-item list-group-item-action bg-dark {{ request_url_is("users*") ? "active": null }}" href="{{ admin_url('users') }}"><i data-feather="users"></i> User Management</a>
             <a class="list-group-item list-group-item-action bg-dark {{ request_url_is("roles*") ? "active": null }}" href="{{ admin_url('roles') }}"><i data-feather="archive"></i> Roles</a>
             <a class="list-group-item list-group-item-action bg-dark {{ request_url_is("admin-menu*") ? "active": null }}" href="{{ admin_url('admin-menu') }}"><i data-feather="menu"></i> Menu Management</a>

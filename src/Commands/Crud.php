@@ -243,7 +243,7 @@ class Crud
 
     private function modelAssign(string $table)
     {
-        $except = ['id','deleted_at','updated_at','password'];
+        $except = ['id','created_at','deleted_at','updated_at','password'];
         $columns = db()->listColumn($table);
         $html = '';
         foreach($columns as $column) {

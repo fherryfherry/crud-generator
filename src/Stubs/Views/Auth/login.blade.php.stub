@@ -9,6 +9,13 @@
     <link rel="preconnect" href="https://cdn.jsdelivr.net/">
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans&display=swap" rel="stylesheet">
+    @if($bgLogin = setting('background_login'))
+    <style>
+    body {
+        background-image: url("{{asset($bgLogin)}}");
+    }
+    </style>
+    @endif
 </head>
 <body>
 
@@ -16,7 +23,7 @@
     <form method="post">
         {!! csrf_input() !!}
         <div class="text-center mb-4">
-            <img class="mb-4" src="{{ asset('vendor/fherryfherry/crud_generator/images/Logo-Square.png') }}" alt="" height="60">
+            <img class="mb-4" src="{{ setting('logo_login')?asset(setting('logo_login')):asset('vendor/fherryfherry/crud_generator/images/Logo-Square.png') }}" alt="" height="60">
             <h1 class="h3 mb-3 fw-normal">Please sign in</h1>
         </div>
 

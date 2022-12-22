@@ -6122,6 +6122,8 @@ button.bg-light:focus {
   background-color: #17263A !important;
 }
 
+.list-header {cursor: default;font-weight: bold;border-bottom: 1px dotted #555}
+
 a.bg-dark:hover, a.bg-dark:focus,
 button.bg-dark:hover,
 button.bg-dark:focus {

@@ -37,7 +37,7 @@ class AdminSettingsController extends Controller {
            try {
                $data = request();
                foreach($data as $key => $value) {
-                   if($key != "_token") {
+                   if($key != "_token" && !is_array($value)) {
                        $setting = Settings::findBy("name", $key);
                        $setting = (!$setting) ? new Settings() : $setting;
                        $setting->name = $key;
@@ -49,14 +49,16 @@ class AdminSettingsController extends Controller {
 
                if($_FILES) {
                    foreach($_FILES as $key => $val) {
-                       if($val['name']) {
+                       if($val['tmp_name']) {
                            $uploadFile = (new FileSystem())->uploadImage($key, md5(time()));
-                           $setting = Settings::findBy("name", $key);
-                           $setting = (!$setting) ? new Settings() : $setting;
-                           $setting->name = $key;
-                           $setting->content = $uploadFile;
-                           $setting->save();
-                           cache("setting_".$key, $uploadFile, 3600);
+                           if($uploadFile) {
+                               $setting = Settings::findBy("name", $key);
+                               $setting = (!$setting) ? new Settings() : $setting;
+                               $setting->name = $key;
+                               $setting->content = $uploadFile;
+                               $setting->save();
+                               cache("setting_".$key, $uploadFile, 3600);
+                           }
                        }
                    }
                }
@@ -68,5 +70,14 @@ class AdminSettingsController extends Controller {
 
            redirect_back(['message'=>'Data has been saved!','type'=>'success']);
        }
+   }
+
+   /**
+    * @route remove/{key}
+    */
+   public function removeKey($key) {
+       Settings::deleteWhere("name = ?",[$key]);
+       cache_forget("setting_".$key);
+       return redirect_back(['message'=>'Setting has been deleted!','type'=>'success']);
    }
 }
