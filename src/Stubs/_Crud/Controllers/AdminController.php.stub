@@ -86,6 +86,10 @@ class Admin{class_name}Controller extends Controller
                {model_assign}
                $data->save();
 
+               if(!request('id') && request('submit') == 'Add More') {
+                   return redirect_back(['message'=>'Data has been saved!','type'=>'success']);
+               }
+
            } catch (\Exception $e) {
                logging($e);
                return redirect_back(['message'=>$e->getMessage(),'type'=>'warning']);
