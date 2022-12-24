@@ -8,6 +8,8 @@ use App\Services\{model}Service;
 use SuperFrameworkEngine\Foundation\Controller;
 use SuperFrameworkEngine\App\UtilValidator\Validator;
 
+{select_repository}
+
 /**
 * @route admin/{route_class}
 */
@@ -15,7 +17,7 @@ class Admin{class_name}Controller extends Controller
 {
     public function __construct()
     {
-        if(!admin_auth()->id()) redirect(admin_url("auth/login"));
+        if(!admin_auth()->id()) return redirect(admin_url("auth/login"));
     }
 
     /**
@@ -26,13 +28,10 @@ class Admin{class_name}Controller extends Controller
         $data = [];
         $data['page_title'] = "Data {module}";
         $data['page_heading'] = "Data {module}";
-
-
-        $params = [];
-        if(request('search')) {
-            $params['{name_field} like'] = '%' . request('search'). '%';
-        }
-        $data['result'] = {model}Repository::findAllByPaginate($params);
+        $data['result'] = {model}Repository::paginate(10, "id", "desc", function($query) {
+            $query->whereIsset(request('search'),'{name_field} like ?',['%'.request('search').'%']);
+            return $query;
+        });
         return view("Admin::{view}.index",$data);
     }
 
@@ -44,6 +43,8 @@ class Admin{class_name}Controller extends Controller
         $data = [];
         $data['page_title'] = "Data {module}";
         $data['page_heading'] = "Add {module}";
+
+        {select_query}
 
         return view("Admin::{view}.form", $data);
     }
@@ -61,6 +62,9 @@ class Admin{class_name}Controller extends Controller
         $data['page_heading'] = "Edit {module}";
 
         $data['row'] = {model}Repository::findById($id);
+
+        {select_query}
+
         return view("Admin::{view}.form", $data);
     }
 
@@ -84,11 +88,43 @@ class Admin{class_name}Controller extends Controller
 
            } catch (\Exception $e) {
                logging($e);
-               redirect_back(['message'=>$e->getMessage(),'type'=>'warning']);
+               return redirect_back(['message'=>$e->getMessage(),'type'=>'warning']);
            }
 
-           redirect(admin_url('{module_path}'),['message'=>'Data has been saved!','type'=>'success']);
+           return redirect(admin_url('{module_path}'),['message'=>'Data has been saved!','type'=>'success']);
         }
+    }
+
+    /**
+     * @route duplicate/{id}
+     * @param $id
+     */
+    public function duplicate($id)
+    {
+        $data = {model}::findById($id);
+        $data->{name_field} = preg_replace('/\(\d+\)$/','',$data->{name_field});
+        $countData = {model}::query()->where("{name_field} like ?",[$data->{name_field}.'%'])->count() + 1;
+        $data->id = null;
+        $data->{name_field} = $data->{name_field} . " (" . $countData . ")";
+        $data->save();
+
+        return redirect_back(['message'=>'Data has been duplicated!','type'=>'success']);
+    }
+
+    /**
+     * @route bulk
+     */
+    public function bulkAction()
+    {
+        if(request('bulk_action') && request('checkbox')) {
+            switch (request('bulk_action')) {
+                case "DELETE":
+                    {model}::query()->whereIn("id",request("checkbox"))->delete();
+                    return redirect_back(['message'=>count(request('checkbox')).' Records has been deleted!','type'=>'success']);
+                    break;
+            }
+        }
+        return redirect_back();
     }
 
 
@@ -100,6 +136,6 @@ class Admin{class_name}Controller extends Controller
     {
         {model}::delete($id);
 
-        redirect_back(['message'=>'The data has been deleted!','type'=>'success']);
+        return redirect_back(['message'=>'The data has been deleted!','type'=>'success']);
     }
 }

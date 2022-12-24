@@ -3,6 +3,7 @@
     <div class="row mb-2">
         <div class="col-9">
             <a href="{{ admin_url("{module_path}/add") }}" class="btn btn-sm btn-primary"><i data-feather="plus"></i> Add Data</a>
+            <button title="Delete All" onclick="deleteAll(this)" disabled class="btn btn-sm btn-danger btn-delete-all"><i data-feather="trash-2"></i> Delete All</button>
 {{--            <a href="#" class="btn btn-sm btn-info"><i data-feather="filter"></i> Filter Data</a>--}}
         </div>
         <div class="col-3">
@@ -19,9 +20,13 @@
             <div class="card-subtitle text-muted">Show list data</div>
         </div>
         <div class="card-body table-responsive">
+            <form action="{{ admin_url('{module_path}/bulk') }}" id="form-bulk" method="post">
+                {!! csrf_input() !!}
+                <input type="hidden" name="bulk_action">
             <table class="table table-striped">
                 <thead>
                 <tr class="bg-light">
+                    <th width="5%"><input type="checkbox" class="check-all" onclick="checkAll(this)"></th>
                     {th_list}
                     <th width="20%">Action</th>
                 </tr>
@@ -29,10 +34,12 @@
                 <tbody>
                     @foreach($result['data'] as $row)
                     <tr>
+                        <td><input type="checkbox" class="checkbox" name="checkbox[]" onclick="tickBox()" value="{{$row['id']}}"></td>
                         {td_list}
                         <td class="text-nowrap">
-                            <a href="{{ admin_url('{module_path}/edit/'.$row['id']) }}?ref={{base64_encode(get_current_url())}}" class="btn btn-sm btn-warning"><i data-feather="edit"></i></a>
-                            <a href="{{ admin_url('{module_path}/delete/'.$row['id']) }}?ref={{base64_encode(get_current_url())}}" onclick="if(!confirm('Are you sure want to delete?')) return false" class="btn btn-sm btn-danger"><i data-feather="trash-2"></i></a>
+                            <a title="Duplicate Data" href="{{ admin_url('{module_path}/duplicate/'.$row['id']) }}?ref={{base64_encode(get_current_url())}}" onclick="if(!confirm('Are you sure want to duplicate?')) return false" class="btn btn-sm btn-info"><i data-feather="copy"></i></a>
+                            <a title="Edit Data" href="{{ admin_url('{module_path}/edit/'.$row['id']) }}?ref={{base64_encode(get_current_url())}}" class="btn btn-sm btn-warning"><i data-feather="edit"></i></a>
+                            <a title="Delete Data" href="{{ admin_url('{module_path}/delete/'.$row['id']) }}?ref={{base64_encode(get_current_url())}}" onclick="if(!confirm('Are you sure want to delete?')) return false" class="btn btn-sm btn-danger"><i data-feather="trash-2"></i></a>
                         </td>
                     </tr>
                     @endforeach
@@ -41,7 +48,35 @@
                     @endif
                 </tbody>
             </table>
+            </form>
             {!! $result['links'] !!}
         </div>
     </div>
+    @push('bottom')
+        <script>
+            function checkAll(t) {
+                $(".checkbox").prop("checked",$(t).prop("checked"));
+                tickBox();
+            }
+            function deleteAll(t) {
+                if(!confirm("Are you sure want to delete all records?")) {
+                    return;
+                }
+                if($(".checkbox:checked").length == 0) {
+                    alert("Please tick at least 1 record for first!")
+                    return;
+                }
+
+                $("#form-bulk input[name=bulk_action]").val("DELETE");
+                $("#form-bulk").submit();
+            }
+            function tickBox() {
+                if($(".checkbox:checked").length > 0) {
+                    $(".btn-delete-all").prop("disabled", false);
+                } else {
+                    $(".btn-delete-all").prop("disabled", true);
+                }
+            }
+        </script>
+    @endpush
 @endsection

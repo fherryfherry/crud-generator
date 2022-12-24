@@ -7,8 +7,10 @@
     "ext-json": "*",
     "ext-pdo": "*",
     "ext-openssl": "*",
-    "ext-curl": "*",
-    "fherryfherry/super-framework-engine": "^1.0"
+    "ext-curl": "*"
+  },
+  "require-dev": {
+    "fherryfherry/super-framework-engine": "@dev"
   },
   "license": "MIT",
   "authors": [
@@ -17,7 +19,7 @@
       "email": "ferdevelop15@gmail.com"
     }
   ],
-  "minimum-stability": "stable",
+  "minimum-stability": "dev",
   "prefer-stable": true,
   "autoload": {
     "psr-4": {
