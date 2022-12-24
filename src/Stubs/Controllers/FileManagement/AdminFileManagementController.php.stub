@@ -1,0 +1,44 @@
+<?php
+
+namespace App\Modules\Admin\Controllers;
+
+use SuperFrameworkEngine\App\UtilFileSystem\FileSystem;
+use SuperFrameworkEngine\Foundation\Controller;
+
+/**
+* @route admin/file-management
+*/
+class AdminFileManagementController extends Controller
+{
+    public function __construct()
+    {
+        if(!admin_auth()->id()) redirect(admin_url("auth/login"));
+    }
+
+    /**
+    * @route upload-image
+    */
+    public function uploadImage()
+    {
+        if(request_method_is_post()) {
+            $upload = FileSystem::uploadImage('image', random_string());
+            return ($upload)?asset($upload):null;
+        }
+        return null;
+    }
+
+    /**
+     * @route delete-image
+     */
+    public function deleteImage()
+    {
+        if(request_method_is_post()) {
+            if(preg_match("/^uploads\//",request("src")) && preg_match("/(.jpeg|.jpg|.png)/",request("src"))) {
+                @unlink(public_path(str_replace(url(),'',request('src'))));
+            }
+
+            return "ok";
+        }
+        return null;
+    }
+}
