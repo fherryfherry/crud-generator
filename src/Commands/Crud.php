@@ -44,6 +44,9 @@ class Crud
         $alias['form_group'] = $this->formGroup($table);
         $alias['add_validate_rule'] = $this->makeValidationRule($table);
         $alias['th_total'] = $this->thTotal($table);
+        $selectQuery = $this->selectQuery($table);
+        $alias['select_query'] = $selectQuery[0];
+        $alias['select_repository'] = $selectQuery[1];
 
         // Re make model
         ShellProcess::run("cd ".base_path()." && ".PHP_BINARY." super make:model --ignore-header");
@@ -67,6 +70,33 @@ class Crud
         ShellProcess::run("cd ".base_path()." && ".PHP_BINARY." super compile --ignore-header");
 
         $this->success("CRUD table `{$table}` has been created!");
+    }
+
+    private function selectQuery($table) {
+        $columnList = db()->listColumn($table);
+        $input = null;
+        $repos = null;
+        foreach($columnList as $column) {
+            if(strtolower(substr($column,-3, 3)) == "_id") {
+                $tableJoin = substr($column, 0, strpos($column, "_id"));
+                $isHasTable = true;
+                if (!db()->hasTable($tableJoin)) {
+                    if (db()->hasTable($tableJoin . "s")) {
+                        $tableJoin .= "s";
+                        $isHasTable = true;
+                    } else {
+                        $isHasTable = false;
+                    }
+                }
+                if($isHasTable) {
+                    $nameField = $this->nameField($tableJoin);
+                    $modelClass = convert_snake_to_CamelCase($tableJoin, true);
+                    $repos .= 'use App\Repositories\\'.$modelClass.'Repository;'."\n";
+                    $input .= "\t\t".'$data["'.$nameField.'_list"] = '.$modelClass.'Repository::findAll();'."\n";
+                }
+            }
+        }
+        return [$input,$repos];
     }
 
     private function addMenu(string $name, string $modulePath)
@@ -114,7 +144,7 @@ class Crud
     }
 
     private function nameField(string $table) {
-        $candidates = ['name','title','no','number'];
+        $candidates = ['name','nama','alias','sku','title','no_','_no','number'];
         $columns = db()->listColumn($table);
         $word = "id";
         foreach ($columns as $column) {
@@ -142,6 +172,29 @@ class Crud
 
         $input = null;
         $isFocus = $focus ? "autofocus" : "";
+
+        if(strtolower(substr($column,-3, 3)) == "_id") {
+            $tableJoin = substr($column,0, strpos($column,"_id"));
+            $isHasTable = true;
+            if(!db()->hasTable($tableJoin)) {
+                if(db()->hasTable($tableJoin."s")) {
+                    $tableJoin .= "s";
+                    $isHasTable = true;
+                } else {
+                    $isHasTable = false;
+                }
+            }
+            if($isHasTable) {
+                $nameField = $this->nameField($tableJoin);
+                $columnRead = ucwords(str_replace("_"," ",$column));
+                $input .= "<select class='form-control' name='{$column}' required>\n";
+                $input .= "\t<option value=''>** Select a {$columnRead}</option>\n";
+                $input .= "\t".'@foreach($'.$tableJoin.'_list as $item)'."\n";
+                $input .= "\t".'<option {{isset($row)&&$row->'.$column.'==$item["id"]?"selected":null}} value="{{$item[\'id\']}}">{{$item[\''.$nameField.'\']}}</option>'."\n";
+                $input .= "\t".'@endforeach'."\n";
+                $input .= "</select>";
+            }
+        }
 
         foreach($inputImage as $name) {
             if(strpos($column, $name) !== false) {
@@ -212,16 +265,12 @@ class Crud
         $columns = db()->listColumn($table);
         $html = "";
         $e = 0;
+        $template = file_get_contents(__DIR__."/../Stubs/_Crud/Views/form_group_template.blade.php.stub");
         foreach($columns as $column) {
             $columnRead = ucwords(str_replace("_"," ",$column));
             if(!in_array($column,$except)) {
                 $input = $this->inputHtml($column, ($e==0) );
-                $html .= '
-                <div class="form-group">
-                    <label for="input-'.$column.'">'.$columnRead.'</label>
-                    '.$input.'
-                </div>
-                ';
+                $template = str_replace(["{column}","{columnRead}","{input}"],[$column,$columnRead,$input],$template);
                 $e++;
             }
         }
@@ -248,7 +297,7 @@ class Crud
         $html = '';
         foreach($columns as $column) {
             if(!in_array($column,$except)) {
-                $html .= '$data->'.$column.' = request("'.$column.'");'."\n\t\t\t\t";
+                $html .= "\t\t\t\t".'$data->'.$column.' = request("'.$column.'");'."\n";
             }
         }
         return $html;
@@ -260,7 +309,7 @@ class Crud
         $columns = db()->listColumn($table);
         $totalCols = 0;
         foreach($columns as $column) {
-            if(!in_array($column,$except)) {
+            if(!in_array($column,$except) && substr($column, -3, 3) != "_id") {
                 $totalCols += 1;
             }
         }
@@ -278,8 +327,8 @@ class Crud
         $html = "";
         foreach($columns as $column) {
             $columnRead = ucwords(str_replace("_"," ",$column));
-            if(!in_array($column,$except)) {
-                $html .= "\n".'<th>'.$columnRead.'</th>';
+            if(!in_array($column,$except) && substr($column, -3, 3) != "_id") {
+                $html .= "\t\t\t\t\t".'<th>'.$columnRead.'</th>'."\n";
             }
         }
         return $html;
@@ -291,8 +340,8 @@ class Crud
         $columns = db()->listColumn($table);
         $html = "";
         foreach($columns as $column) {
-            if(!in_array($column,$except)) {
-                $html .= "\t".'<td>{{$row["'.$column.'"]}}</td>'."\n";
+            if(!in_array($column,$except) && substr($column, -3, 3) != "_id") {
+                $html .= "\t\t\t\t\t\t".'<td>{{$row["'.$column.'"]}}</td>'."\n";
             }
         }
         return $html;

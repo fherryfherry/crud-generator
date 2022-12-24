@@ -8,6 +8,8 @@ use App\Services\{model}Service;
 use SuperFrameworkEngine\Foundation\Controller;
 use SuperFrameworkEngine\App\UtilValidator\Validator;
 
+{select_repository}
+
 /**
 * @route admin/{route_class}
 */
@@ -26,13 +28,10 @@ class Admin{class_name}Controller extends Controller
         $data = [];
         $data['page_title'] = "Data {module}";
         $data['page_heading'] = "Data {module}";
-
-
-        $params = [];
-        if(request('search')) {
-            $params['{name_field} like'] = '%' . request('search'). '%';
-        }
-        $data['result'] = {model}Repository::findAllByPaginate($params);
+        $data['result'] = {model}Repository::paginate(10, "id", "desc", function($query) {
+            $query->whereIsset(request('search'),'{name_field} like ?',['%'.request('search').'%']);
+            return $query;
+        });
         return view("Admin::{view}.index",$data);
     }
 
@@ -44,6 +43,8 @@ class Admin{class_name}Controller extends Controller
         $data = [];
         $data['page_title'] = "Data {module}";
         $data['page_heading'] = "Add {module}";
+
+        {select_query}
 
         return view("Admin::{view}.form", $data);
     }
@@ -61,6 +62,9 @@ class Admin{class_name}Controller extends Controller
         $data['page_heading'] = "Edit {module}";
 
         $data['row'] = {model}Repository::findById($id);
+
+        {select_query}
+
         return view("Admin::{view}.form", $data);
     }
 
@@ -84,10 +88,10 @@ class Admin{class_name}Controller extends Controller
 
            } catch (\Exception $e) {
                logging($e);
-               redirect_back(['message'=>$e->getMessage(),'type'=>'warning']);
+               return redirect_back(['message'=>$e->getMessage(),'type'=>'warning']);
            }
 
-           redirect(admin_url('{module_path}'),['message'=>'Data has been saved!','type'=>'success']);
+           return redirect(admin_url('{module_path}'),['message'=>'Data has been saved!','type'=>'success']);
         }
     }
 
@@ -100,6 +104,6 @@ class Admin{class_name}Controller extends Controller
     {
         {model}::delete($id);
 
-        redirect_back(['message'=>'The data has been deleted!','type'=>'success']);
+        return redirect_back(['message'=>'The data has been deleted!','type'=>'success']);
     }
 }
