@@ -56,6 +56,9 @@ class AdminInit
         // Make setting
         $this->makeSetting();
 
+        // Make File Management
+        $this->makeFileManagement();
+
         // Create Dummy User
         $newDummyUser = false;
         if(db("users")->where("name = 'superadmin' or email = 'superadmin@example.com'")->count() == 0) {
@@ -164,7 +167,11 @@ class AdminInit
         $this->copyViews("Auth","app/Modules/Admin/Views/auth");
     }
 
-
+    private function makeFileManagement()
+    {
+        // copy controller
+        $this->copyControllers("FileManagement","app/Modules/Admin/Controllers");
+    }
 
     private function makeProfile()
     {
