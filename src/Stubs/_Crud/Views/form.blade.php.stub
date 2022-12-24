@@ -5,7 +5,8 @@
         <a href="{{ request('ref') ? base64_decode(request('ref')) : admin_url('{module_path}') }}">&laquo; Go back to list data</a>
     </p>
     <div class="row mb-5">
-        <div class="col-md-7">
+        <div class="col-md-2"></div>
+        <div class="col-md-8">
             <div class="card">
                 <div class="card-header">
                     <h4 class="card-title">{{ $page_heading }}</h4>
@@ -28,6 +29,7 @@
             </div>
             <!-- end card -->
         </div>
+        <div class="col-md-2"></div>
     </div>
 
 @endsection

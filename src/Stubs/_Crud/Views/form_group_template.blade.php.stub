@@ -1,4 +1,4 @@
 <div class="form-group">
-    <label for="input-{column}">{columnRead}</label>
-    {input}
-</div>
+                            <label for="input-{column}">{columnRead}</label>
+                            {input}
+                        </div>

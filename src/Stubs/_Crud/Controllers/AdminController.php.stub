@@ -17,7 +17,7 @@ class Admin{class_name}Controller extends Controller
 {
     public function __construct()
     {
-        if(!admin_auth()->id()) redirect(admin_url("auth/login"));
+        if(!admin_auth()->id()) return redirect(admin_url("auth/login"));
     }
 
     /**
@@ -93,6 +93,38 @@ class Admin{class_name}Controller extends Controller
 
            return redirect(admin_url('{module_path}'),['message'=>'Data has been saved!','type'=>'success']);
         }
+    }
+
+    /**
+     * @route duplicate/{id}
+     * @param $id
+     */
+    public function duplicate($id)
+    {
+        $data = {model}::findById($id);
+        $data->{name_field} = preg_replace('/\(\d+\)$/','',$data->{name_field});
+        $countData = {model}::query()->where("{name_field} like ?",[$data->{name_field}.'%'])->count() + 1;
+        $data->id = null;
+        $data->{name_field} = $data->{name_field} . " (" . $countData . ")";
+        $data->save();
+
+        return redirect_back(['message'=>'Data has been duplicated!','type'=>'success']);
+    }
+
+    /**
+     * @route bulk
+     */
+    public function bulkAction()
+    {
+        if(request('bulk_action') && request('checkbox')) {
+            switch (request('bulk_action')) {
+                case "DELETE":
+                    {model}::query()->whereIn("id",request("checkbox"))->delete();
+                    return redirect_back(['message'=>count(request('checkbox')).' Records has been deleted!','type'=>'success']);
+                    break;
+            }
+        }
+        return redirect_back();
     }
 
 
