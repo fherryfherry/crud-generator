@@ -23,7 +23,7 @@
 
                         <div class="mb-3"></div>
                         <input type="submit" class="btn btn-primary" name="submit" value="Save">
-                        @if(isset($row) && $row->id)<input type="submit" class="btn btn-light" name="submit" value="Add More">@endif
+                        @if(!isset($row))<input type="submit" class="btn btn-light" name="submit" value="Add More">@endif
                     </form>
                 </div>
                 <!-- end card-body-->
