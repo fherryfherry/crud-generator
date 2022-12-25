@@ -8,7 +8,11 @@ use App\Services\{model}Service;
 use SuperFrameworkEngine\Foundation\Controller;
 use SuperFrameworkEngine\App\UtilValidator\Validator;
 
+{use_model_md}
+{use_repository_md}
+
 {select_repository}
+{select_repository_md}
 
 /**
 * @route admin/{route_class}
@@ -64,6 +68,10 @@ class Admin{class_name}Controller extends Controller
         $data['row'] = {model}Repository::findById($id);
 
         {select_query}
+        {select_query_md}
+
+        {data_item}
+        {data_item_list}
 
         return view("Admin::{view}.form", $data);
     }
@@ -90,6 +98,10 @@ class Admin{class_name}Controller extends Controller
                    return redirect_back(['message'=>'Data has been saved!','type'=>'success']);
                }
 
+               if(!request('id') && request('submit') == 'Save & Entry Items') {
+                   return redirect(admin_url('{module_path}/edit/'.$data->id),['message'=>'Data has been saved, please entry the item','type'=>'success']);
+               }
+
            } catch (\Exception $e) {
                logging($e);
                return redirect_back(['message'=>$e->getMessage(),'type'=>'warning']);
@@ -98,6 +110,8 @@ class Admin{class_name}Controller extends Controller
            return redirect(admin_url('{module_path}'),['message'=>'Data has been saved!','type'=>'success']);
         }
     }
+
+    {md_methods}
 
     /**
      * @route duplicate/{id}

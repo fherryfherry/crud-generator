@@ -10552,3 +10552,18 @@ a.text-dark:hover, a.text-dark:focus {
 
 .select2-container--classic.select2-container--open .select2-dropdown {
   border-color: #5897fb; }
+
+.backdrop {
+  position: absolute; /* position the element at the top-left corner of the viewport */
+  top: 0;
+  left: 0;
+  width: 100%; /* make the element take up the full width of the viewport */
+  height: 100%; /* make the element take up the full height of the viewport */
+  background-color: rgba(0, 0, 0, 0.5); /* set the background color to a semi-transparent black */
+  z-index: 10; /* set the z-index to a value above all other elements on the page */
+}
+
+.backdrop-blur {
+  filter: blur(20px); /* add a blur effect to the element */
+  -webkit-filter: blur(20px); /* add a blur effect for webkit browsers */
+}

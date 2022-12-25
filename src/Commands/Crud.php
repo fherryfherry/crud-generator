@@ -13,10 +13,9 @@ class Crud
     use OutputMessage, CommandArguments;
 
     /**
-     * @description Create table`s crud module
+     * @description Create table`s crud module. Ex: make:crud products --name="Produk"
      * @command make:crud
      * @param $table
-     * @param null $moduleName
      */
     public function run($table) {
         $arguments = func_get_args();
@@ -30,7 +29,11 @@ class Crud
             return false;
         }
 
+        $browseColumns = $this->getArgument($arguments,"browseColumns");
+        $tableDetail = $this->getArgument($arguments,"tableDetail");
+
         $alias = [];
+        $alias['table'] = $table;
         $alias['model'] = convert_snake_to_CamelCase($table, true);
         $alias['route_class'] = $table;
         $alias['class_name'] = convert_snake_to_CamelCase($table, true);
@@ -39,14 +42,48 @@ class Crud
         $alias['view'] = $table;
         $alias['model_assign'] = $this->modelAssign($table);
         $alias['module_path'] = $table;
-        $alias['th_list'] = $this->thList($table);
-        $alias['td_list'] = $this->tdList($table);
+        $alias['th_list'] = $this->thList($table,$browseColumns);
+        $alias['td_list'] = $this->tdList($table,$browseColumns);
         $alias['form_group'] = $this->formGroup($table);
+
         $alias['add_validate_rule'] = $this->makeValidationRule($table);
         $alias['th_total'] = $this->thTotal($table);
         $selectQuery = $this->selectQuery($table);
         $alias['select_query'] = $selectQuery[0];
         $alias['select_repository'] = $selectQuery[1];
+        if($tableDetail) {
+            $templateMdMethod = trim(file_get_contents(__DIR__."/../Stubs/_Crud/Controllers/MdMethod.php.stub"));
+            $templateController = str_replace("{md_methods}",$templateMdMethod, $templateController);
+            $alias['model_md'] = convert_snake_to_CamelCase($tableDetail, true);
+            $alias['class_name_md'] = convert_snake_to_CamelCase($tableDetail, true);
+            $alias['use_model_md'] = 'use App\Models\\'.$alias['model_md'].';';
+            $alias['use_repository_md'] = 'use App\Repositories\\'.$alias['model_md'].'Repository;';
+            $alias['model_assign_md'] = $this->modelAssign($tableDetail, [$table.'_id']);
+            $alias['th_md_list'] = $this->thList($tableDetail);
+            $alias['td_md_list'] = $this->tdList($tableDetail,null, '$itemRow');
+            $alias['th_md_total'] = $this->thTotal($tableDetail);
+            $alias['form_md_group'] = $this->formGroup($tableDetail, [$table.'_id'], '$item');
+            $alias['add_validate_rule_md'] = $this->makeValidationRule($tableDetail,[$table.'_id']);
+            $selectQueryMd = $this->selectQuery($tableDetail,array_merge([$table],$selectQuery[2]));
+            $alias['select_query_md'] = $selectQueryMd[0];
+            $alias['select_repository_md'] = $selectQueryMd[1];
+            $alias['data_item'] = '$data["item"] = '.$alias['model_md'].'::findById(request("item_id"));';
+            $alias['data_item_list'] = '$data["item_list"] = '.$alias['model_md'].'::query()->where("'.$table.'_id=?",[$id])->get();';
+            $templateForm = file_get_contents(__DIR__."/../Stubs/_Crud/Views/form_md.blade.php.stub");
+        } else {
+            $alias['model_md'] = '';
+            $alias['class_name_md'] = '';
+            $alias['use_model_md'] = '';
+            $alias['use_repository_md'] = '';
+            $alias['select_query_md'] = '';
+            $alias['select_repository_md'] = '';
+            $alias['model_assign_md'] = '';
+            $alias['data_item'] = '';
+            $alias['data_item_list'] = '';
+            $alias['save_item_method'] = '';
+            $alias['add_validate_rule_md'] = '';
+            $alias['md_methods'] = '';
+        }
 
         // Re make model
         ShellProcess::run("cd ".base_path()." && ".PHP_BINARY." super make:model --ignore-header");
@@ -72,10 +109,11 @@ class Crud
         $this->success("CRUD table `{$table}` has been created!");
     }
 
-    private function selectQuery($table) {
+    private function selectQuery($table,$exceptTable = []) {
         $columnList = db()->listColumn($table);
         $input = null;
         $repos = null;
+        $tableJoins = [];
         foreach($columnList as $column) {
             if(strtolower(substr($column,-3, 3)) == "_id") {
                 $tableJoin = substr($column, 0, strpos($column, "_id"));
@@ -88,14 +126,15 @@ class Crud
                         $isHasTable = false;
                     }
                 }
-                if($isHasTable) {
+                if($isHasTable && !in_array($tableJoin,$exceptTable)) {
                     $modelClass = convert_snake_to_CamelCase($tableJoin, true);
                     $repos .= 'use App\Repositories\\'.$modelClass.'Repository;'."\n";
                     $input .= "\t".'$data["'.$tableJoin.'_list"] = '.$modelClass.'Repository::findAll();'."\n";
+                    $tableJoins[] = $tableJoin;
                 }
             }
         }
-        return [$input,$repos];
+        return [$input,$repos,$tableJoins];
     }
 
     private function addMenu(string $name, string $modulePath)
@@ -148,7 +187,7 @@ class Crud
         return $text;
     }
 
-    private function inputHtml(string $column, bool $focus = false)
+    private function inputHtml(string $column, bool $focus = false, $var = '$row')
     {
         $columnRead = $this->readableColumn($column);
         $inputPassword = ['password','sandi','pin'];
@@ -179,8 +218,8 @@ class Crud
                 $columnRead = $this->readableColumn($column);
                 $input .= "<select class='form-control select2' name='{$column}' required>\n";
                 $input .= "\t<option value=''>** Select a {$columnRead}</option>\n";
-                $input .= "\t".'@foreach($'.$tableJoin.'_list as $item)'."\n";
-                $input .= "\t".'<option {{isset($row)&&$row->'.$column.'==$item["id"]?"selected":null}} value="{{$item[\'id\']}}">{{$item[\''.$nameField.'\']}}</option>'."\n";
+                $input .= "\t".'@foreach($'.$tableJoin.'_list as $selectItem)'."\n";
+                $input .= "\t".'<option {{isset('.$var.')&&'.$var.'->'.$column.'==$selectItem["id"]?"selected":null}} value="{{$selectItem[\'id\']}}">{{$selectItem[\''.$nameField.'\']}}</option>'."\n";
                 $input .= "\t".'@endforeach'."\n";
                 $input .= "</select>";
             }
@@ -188,7 +227,7 @@ class Crud
 
         foreach($inputImage as $name) {
             if(strpos($column, $name) !== false) {
-                $input .= "\n".'<p>{!! show_image_html($row->'.$column.') !!}</p>';
+                $input .= "\n".'<p>{!! show_image_html('.$var.'->'.$column.') !!}</p>';
                 $input .= "\n".'<input type="file" accept=".jpg,.jpeg,.png,.gif" id="input-'.$column.'" class="form-control" name="'.$column.'"/>';
                 $input .= "\n".'<div class="help-block">Format file allowed only: jpg,jpeg,png,gif</div>';
             }
@@ -196,7 +235,7 @@ class Crud
 
         foreach($inputUpload as $name) {
             if(strpos($column, $name) !== false) {
-                $input .= "\n".'<p>{!! show_downloadable_link($row->'.$column.') !!}</p>';
+                $input .= "\n".'<p>{!! show_downloadable_link('.$var.'->'.$column.') !!}</p>';
                 $input .= '<input type="file" accept=".jpg,.jpeg,.png,.gif,.zip,.rar,.doc,.docx,.xls,.xlsx" id="input-'.$column.'" class="form-control" name="'.$column.'"/>';
                 $input .= "\n".'<div class="help-block">Format file allowed only: jpg,png,gif,zip,rar,doc,docx,xls,xlsx</div>';
             }
@@ -211,54 +250,54 @@ class Crud
         foreach ($inputGender as $name) {
             if(strpos($column, $name) !== false) {
                 $input = '<select class="form-control" id="input-'.$column.'" name="'.$column.'" required>';
-                $input .= '<option {{isset($row) && $row->'.$column.'=="Male" ? "selected": "" }} value="Male">Male</option>'."\n";
-                $input .= '<option {{isset($row) && $row->'.$column.'=="Female" ? "selected": "" }} value="Female">Female</option>'."\n";
+                $input .= '<option {{isset('.$var.') && '.$var.'->'.$column.'=="Male" ? "selected": "" }} value="Male">Male</option>'."\n";
+                $input .= '<option {{isset('.$var.') && '.$var.'->'.$column.'=="Female" ? "selected": "" }} value="Female">Female</option>'."\n";
                 $input .= '</select>';
             }
         }
 
         foreach ($inputTextArea as $name) {
             if(strpos($column, $name) !== false) {
-                $input = '<textarea '.$isFocus.' id="input-'.$column.'" name="'.$column.'" class="form-control editor" required >{{ isset($row)?$row->'.$column.' : null }}</textarea>';
+                $input = '<textarea '.$isFocus.' id="input-'.$column.'" name="'.$column.'" class="form-control editor" required >{{ isset('.$var.')?'.$var.'->'.$column.' : null }}</textarea>';
             }
         }
 
         foreach ($inputEmail as $name) {
             if(strpos($column, $name) !== false) {
-                $input = '<input type="email" '.$isFocus.' id="input-'.$column.'" class="form-control" required name="'.$column.'" placeholder="Enter '.$columnRead.'" value="{{ isset($row) ? $row->'.$column.' : null }}"/>';
+                $input = '<input type="email" '.$isFocus.' id="input-'.$column.'" class="form-control" required name="'.$column.'" placeholder="Enter '.$columnRead.'" value="{{ isset('.$var.') ? '.$var.'->'.$column.' : null }}"/>';
             }
         }
 
         foreach ($inputPhone as $name) {
             if(strpos($column, $name) !== false) {
-                $input = '<input type="number" '.$isFocus.' id="input-'.$column.'" class="form-control" required name="'.$column.'" placeholder="Enter '.$columnRead.'" value="{{ isset($row) ? $row->'.$column.' : null }}"/>';
+                $input = '<input type="number" '.$isFocus.' id="input-'.$column.'" class="form-control" required name="'.$column.'" placeholder="Enter '.$columnRead.'" value="{{ isset('.$var.') ? '.$var.'->'.$column.' : null }}"/>';
             }
         }
 
         foreach ($inputNumber as $name) {
             if(strpos($column, $name) !== false) {
-                $input = '<input type="number" '.$isFocus.' min="0" id="input-'.$column.'" class="form-control" required name="'.$column.'" placeholder="Enter '.$columnRead.'" value="{{ isset($row) ? $row->'.$column.' : null }}"/>';
+                $input = '<input type="number" '.$isFocus.' min="0" id="input-'.$column.'" class="form-control" required name="'.$column.'" placeholder="Enter '.$columnRead.'" value="{{ isset('.$var.') ? '.$var.'->'.$column.' : null }}"/>';
             }
         }
 
         if(!$input) {
-            $input = '<input type="text" '.$isFocus.' id="input-'.$column.'" class="form-control" required name="'.$column.'" placeholder="Enter '.$columnRead.'" value="{{ isset($row) ? $row->'.$column.' : null }}"/>';
+            $input = '<input type="text" '.$isFocus.' id="input-'.$column.'" class="form-control" required name="'.$column.'" placeholder="Enter '.$columnRead.'" value="{{ isset('.$var.') ? '.$var.'->'.$column.' : null }}"/>';
         }
 
         return $input;
     }
 
-    private function formGroup(string $table)
+    private function formGroup(string $table, array $exceptFields = [], $var = '$row')
     {
         $except = ['id','created_at','deleted_at','updated_at','password'];
-
+        $except = array_merge($except, $exceptFields);
         $columns = db()->listColumn($table);
         $e = 0;
         $html = "";
         foreach($columns as $column) {
             $columnRead = $this->readableColumn($column);
             if(!in_array($column,$except)) {
-                $input = $this->inputHtml($column, ($e==0) );
+                $input = $this->inputHtml($column, ($e==0) , $var);
                 $template = file_get_contents(__DIR__."/../Stubs/_Crud/Views/form_group_template.blade.php.stub");
                 $template = str_replace(["{column}","{columnRead}","{input}"],[$column,$columnRead,$input],$template);
                 $html .= $template."\n";
@@ -268,9 +307,10 @@ class Crud
         return $html;
     }
 
-    private function makeValidationRule(string $table)
+    private function makeValidationRule(string $table, array $exceptFields = [])
     {
         $except = ['id','created_at','deleted_at','updated_at','password'];
+        $except = array_merge($except, $exceptFields);
         $columns = db()->listColumn($table);
         $html = [];
         foreach($columns as $column) {
@@ -281,9 +321,10 @@ class Crud
         return var_min_export($html, true);
     }
 
-    private function modelAssign(string $table)
+    private function modelAssign(string $table, array $exceptFields = [])
     {
         $except = ['id','created_at','deleted_at','updated_at','password'];
+        $except = array_merge($except, $exceptFields);
         $columns = db()->listColumn($table);
         $html = '';
         foreach($columns as $column) {
@@ -311,47 +352,68 @@ class Crud
         return $totalCols;
     }
 
-    private function thList(string $table)
+    private function thList(string $table, string $allowFields = null)
     {
         $except = ['id','deleted_at','updated_at','password'];
+        $allowFields = ($allowFields)?explode(",",$allowFields):null;
         $columns = db()->listColumn($table);
         $html = "";
         foreach($columns as $column) {
             $columnRead = $this->readableColumn($column);
-            if(!in_array($column,$except) && substr($column, -3, 3) != "_id") {
+            if(!in_array($column,$except) && substr($column, -3, 3) != "_id" && !$allowFields) {
+                $html .= "\t\t\t\t\t".'<th>'.$columnRead.'</th>'."\n";
+            }
+            if($allowFields && in_array($column,$allowFields)) {
                 $html .= "\t\t\t\t\t".'<th>'.$columnRead.'</th>'."\n";
             }
         }
+
         return $html;
     }
 
-    private function tdList(string $table)
+    private function tdList(string $table, string $allowFields = null, $variable = '$row')
     {
         $except = ['id','deleted_at','updated_at','password'];
         $descFields = ['description','content','isi','deskripsi'];
+        $priceFields = ['price','harga','nominal','total','nilai','jumlah','amount'];
+        $dateFields = ['created_at','tanggal','date','tgl'];
+        $allowFields = ($allowFields)?explode(",",$allowFields):null;
         $columns = db()->listColumn($table);
         $html = "";
         foreach($columns as $column) {
-            if(!in_array($column,$except) && substr($column, -3, 3) != "_id") {
-                $isAlready = false;
-                foreach($descFields as $field) {
-                    if(stripos($column,$field) !== false) {
-                        $html .= "\t\t\t\t\t\t".'<td>{{substr(strip_tags($row["'.$column.'"]),0,60)}}...</td>'."\n";
-                        $isAlready = true;
-                    }
-                }
-                if(!$isAlready) {
-                    switch ($column) {
-                        case "created_at":
-                            $html .= "\t\t\t\t\t\t".'<td>{!!date("d M Y",strtotime($row["'.$column.'"]))."<br/>".date("H:i",strtotime($row["'.$column.'"]))!!}</td>'."\n";
-                            break;
-                        default:
-                            $html .= "\t\t\t\t\t\t".'<td>{{$row["'.$column.'"]}}</td>'."\n";
-                            break;
-                    }
+            if(in_array($column,$except) && !$allowFields) {
+                continue;
+            }
 
+            if($allowFields && !in_array($column,$allowFields)) {
+                continue;
+            }
+
+            if(substr($column, -3, 3) == "_id") {
+                continue;
+            }
+
+            $td = "\t\t\t\t\t\t".'<td>{{'.$variable.'["'.$column.'"]}}</td>'."\n";
+
+            foreach($descFields as $field) {
+                if(stripos($column,$field) !== false) {
+                    $td = "\t\t\t\t\t\t".'<td>{{substr(strip_tags('.$variable.'["'.$column.'"]),0,60)}}...</td>'."\n";
+                    break;
                 }
             }
+            foreach($priceFields as $field) {
+                if(stripos($column,$field) !== false) {
+                    $td = "\t\t\t\t\t\t".'<td>{{number_format('.$variable.'["'.$column.'"])}}</td>'."\n";
+                    break;
+                }
+            }
+            foreach($dateFields as $field) {
+                if(stripos($column,$field) !== false) {
+                    $td = "\t\t\t\t\t\t".'<td>{!!date("d M Y",strtotime('.$variable.'["'.$column.'"]))."<br/>".date("H:i",strtotime('.$variable.'["'.$column.'"]))!!}</td>'."\n";
+                    break;
+                }
+            }
+            $html .= $td;
         }
         return $html;
     }
