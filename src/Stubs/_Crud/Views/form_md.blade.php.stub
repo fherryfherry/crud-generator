@@ -1,0 +1,95 @@
+@extends("layout")
+@section("content")
+
+<p>
+    <a href="{{ request('ref') ? base64_decode(request('ref')) : admin_url('{module_path}') }}">&laquo; Go back to list data</a>
+</p>
+
+<div class="card mb-3">
+    <div class="card-header">
+        <h4 class="card-title">{{ $page_heading }}</h4>
+        <p class="card-subtitle"> Complete the form data bellow:
+        </p>
+    </div>
+    <div class="card-body">
+        <?php /** @var \App\Models\{model} $row */ ?>
+        <form autocomplete="off" action="{{ admin_url('{module_path}/save') }}" method="post">
+            <input type="hidden" name="_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="id" value="{{ isset($row) ? $row->id : null }}">
+
+            {form_group}
+
+            <div class="mb-3"></div>
+            <input type="submit" class="btn btn-primary" name="submit" value="Save & Entry Items">
+            @if(!isset($row))<input type="submit" class="btn btn-light" name="submit" value="Add More">@endif
+        </form>
+    </div>
+    <!-- end card-body-->
+</div>
+<!-- end card -->
+
+<!-- FORM DETAIL -->
+<div class="card mb-3">
+    @if(!$row)<div class="backdrop backdrop-blur"></div>@endif
+    <div class="card-header">
+        @if(!$item)
+        <h4 class="card-title">Add Item</h4>
+        @else
+        <h4 class="card-title">Edit Item</h4>
+        @endif
+    </div>
+    <div class="card-body">
+        <form method="post" action="{{admin_url("{module_path}/save-item/".$row->id)}}">
+        {!! csrf_input() !!}
+        <input type="hidden" name="id" value="{{$item->id}}">
+
+        {form_md_group}
+
+        <div class="mb-3"></div>
+        @if($item)
+        <input type="submit" class="btn btn-success" name="submit" value="Save">
+        @else
+        <input type="submit" class="btn btn-info" name="submit" value="Add To Table">
+        @endif
+
+        <a href="{{get_current_url(['item_id'=>null])}}" class="btn btn-light">New Data</a>
+        </form>
+    </div>
+</div>
+
+<!-- TABLE DETAIL -->
+<div class="card mb-3">
+    @if(!$row)<div class="backdrop backdrop-blur"></div>@endif
+    <div class="card-header">
+        <div class="card-title font-weight-bold">
+            Item List
+        </div>
+        <div class="card-subtitle text-muted">Show list data</div>
+    </div>
+    <div class="card-body table-responsive">
+        <table class="table table-striped">
+            <thead>
+            <tr class="bg-light">
+                {th_md_list}
+                <th width="20%">Action</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach($item_list as $itemRow)
+            <tr>
+                {td_md_list}
+                <td class="text-nowrap">
+                    <a title="Edit Data" href="{{ get_current_url(['item_id'=>$itemRow['id']]) }}" class="btn btn-sm btn-warning"><i data-feather="edit"></i></a>
+                    <a title="Delete Data" href="{{ admin_url('{module_path}/delete-item/'.$itemRow['id']) }}?ref={{base64_encode(get_current_url())}}" onclick="if(!confirm('Are you sure want to delete?')) return false" class="btn btn-sm btn-danger"><i data-feather="trash-2"></i></a>
+                </td>
+            </tr>
+            @endforeach
+            @if(count($item_list)==0)
+            <tr><td colspan='{th_md_total}' class='text-center'>There is no data yet</td></tr>
+            @endif
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@endsection

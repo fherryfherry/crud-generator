@@ -1,0 +1,41 @@
+    /**
+     * @route save-item/{id}
+     */
+    public function saveItem($id)
+    {
+        if(request_method_is_post()) {
+            try {
+                Validator::make(request(),{add_validate_rule_md});
+
+                if(request('id')) {
+                    $data = {model_md}::findById(request('id'));
+                } else {
+                    $data = new {model_md}();
+                    $data->{table}_id = $id;
+                }
+
+                {model_assign_md}
+                $data->save();
+
+                if(!request('id') && request('submit') == 'Add More') {
+                    return redirect_back(['message'=>'Item has been saved!','type'=>'success']);
+                }
+
+            } catch (\Exception $e) {
+                logging($e);
+                return redirect_back(['message'=>$e->getMessage(),'type'=>'warning']);
+            }
+
+            return redirect_back(['message'=>'Item has been saved!','type'=>'success']);
+        }
+    }
+
+    /**
+    * @route delete-item/{id}
+    * @param $id
+    */
+    public function deleteItem($id)
+    {
+        {model_md}::delete($id);
+        return redirect_back(['message'=>'The data has been deleted!','type'=>'success']);
+    }
