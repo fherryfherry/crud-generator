@@ -30,6 +30,7 @@ php super make:crud products --name="Master Produk"
 | ------- | ----------- |
 | admin:init | Untuk membuat halaman Admin, dijalankan pertama kali |
 | make:crud {table} --name=[module name]| Untuk membuat CRUD module |
+| make:crud {table} --name="Nama Modul" --tableDetail="{table_detail}"| Pada perintah ini --tableDetail digunakan apabila Kamu ingin membuat form master - detail (Ex. Order dan Items) |
 | make:user --email=[email] --password=[pass] | Membuat user melalui cli |
 ## WYSIWYG
 Plugin wysiwyg yang dipakai di CRUD Generator ini menggunakan library dari *Summernote*. Untuk menggunakan fitur 
