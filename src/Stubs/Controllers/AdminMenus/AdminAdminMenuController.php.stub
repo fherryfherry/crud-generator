@@ -14,7 +14,7 @@ class AdminAdminMenuController extends Controller
 {
     public function __construct()
     {
-        if(!admin_auth()->id()) redirect(admin_url("auth/login"));
+        if(!admin_auth()->id() && admin_auth()->role()->name != "Super Admin") redirect(admin_url("auth/login"));
     }
 
     /**

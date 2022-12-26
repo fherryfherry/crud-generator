@@ -59,6 +59,9 @@ class AdminInit
         // Make File Management
         $this->makeFileManagement();
 
+        // Make Backup
+        $this->makeBackup();
+
         // Create Dummy User
         $newDummyUser = false;
         if(db("users")->where("name = 'superadmin' or email = 'superadmin@example.com'")->count() == 0) {
@@ -105,6 +108,16 @@ class AdminInit
             ]);
         }
 
+    }
+
+    private function makeBackup()
+    {
+        // copy controller
+        $this->copyControllers("Backup","app/Modules/Admin/Controllers");
+
+        // make views
+        $this->makeDirectory("app/Modules/Admin/Views/backup");
+        $this->copyViews("Backup","app/Modules/Admin/Views/backup");
     }
 
     private function makeSetting()

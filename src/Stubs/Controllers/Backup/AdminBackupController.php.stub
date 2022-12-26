@@ -1,0 +1,81 @@
+<?php
+
+namespace App\Modules\Admin\Controllers;
+
+use CrudGenerator\Helpers\CrudBackup;
+use SuperFrameworkEngine\Foundation\Controller;
+
+/**
+* @route admin/backup
+*/
+class AdminBackupController extends Controller
+{
+    public function __construct()
+    {
+        if(!admin_auth()->id() && admin_auth()->role()->name != "Super Admin") redirect(admin_url("auth/login"));
+    }
+
+    /**
+    * @route /
+    */
+    public function index()
+    {
+        $data = [];
+        $data['page_title'] = "Backup Center";
+        $data['page_heading'] = "Backup Center";
+        return view("Admin::backup.backup",$data);
+    }
+
+    /**
+     * @route database
+     */
+    public function database()
+    {
+        $filename = CrudBackup::backupDatabase();
+        if(request('mode')=='save') {
+            return redirect_back(['message'=>'The backup file has been created at '.$filename,'type'=>'success']);
+        } else {
+            header("Content-Type: application/sql");
+            header("Content-Disposition: attachment; filename=\"".basename($filename)."\"");
+            readfile($filename);
+            exit;
+        }
+    }
+
+    /**
+     * @route script
+     */
+    public function script()
+    {
+        $filename = CrudBackup::backupScript(base_path(),base_path("Backup-".str_slug($_ENV['APP_NAME']).'-'.date('YmdHis').".zip"));
+
+        if(request('mode')=='save') {
+            return redirect_back(['message'=>'The backup file has been created at '.$filename,'type'=>'success']);
+        } else {
+            header("Content-Type: application/zip");
+            header("Content-Disposition: attachment; filename=\"".basename($filename)."\"");
+            readfile($filename);
+            exit;
+        }
+    }
+
+
+    /**
+     * @route web
+     */
+    public function web()
+    {
+        CrudBackup::backupDatabase();
+        $filename = CrudBackup::backupScript(base_path(),base_path("Backup-Web-".str_slug($_ENV['APP_NAME']).'-'.date('YmdHis').".zip"));
+
+        if(request('mode')=='save') {
+            return redirect_back(['message'=>'The backup file has been created at '.$filename,'type'=>'success']);
+        } else {
+            header("Content-Type: application/zip");
+            header("Content-Disposition: attachment; filename=\"".basename($filename)."\"");
+            readfile($filename);
+            exit;
+        }
+    }
+
+}

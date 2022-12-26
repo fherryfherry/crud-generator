@@ -7,7 +7,9 @@
     "ext-json": "*",
     "ext-pdo": "*",
     "ext-openssl": "*",
-    "ext-curl": "*"
+    "ext-curl": "*",
+    "ext-zip": "*",
+    "ifsnop/mysqldump-php": "^2.9"
   },
   "require-dev": {
     "fherryfherry/super-framework-engine": "@dev"
