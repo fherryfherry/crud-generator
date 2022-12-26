@@ -13,7 +13,7 @@ class PublishAsset
     use OutputMessage, CommandTrait;
 
     /**
-     * @description Init admin area
+     * @description To publish the asset
      * @command admin:publish-asset
      */
     public function run() {

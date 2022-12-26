@@ -58,12 +58,12 @@
             @endforeach
 
             @if(admin_auth()->role()->name == "Super Admin")
-            <a class="list-group-item list-group-item-action bg-dark" href="javascript:;" style="font-weight: bold; border-bottom: 1px dotted #555; margin-top: 30px;">
-                <i data-feather="layers"></i> SuperAdmin Menu</a>
+            <a class="list-group-item list-group-item-action bg-dark" href="javascript:;" style="font-weight: bold; border-bottom: 1px dotted #555; margin-top: 30px;"><i data-feather="layers"></i> SuperAdmin Menu</a>
             <a class="list-group-item list-group-item-action bg-dark {{ request_url_is(config("admin_path")."users*") ? "active": null }}" href="{{ admin_url('users') }}"><i data-feather="users"></i> User Management</a>
             <a class="list-group-item list-group-item-action bg-dark {{ request_url_is(config("admin_path")."roles*") ? "active": null }}" href="{{ admin_url('roles') }}"><i data-feather="archive"></i> Roles</a>
             <a class="list-group-item list-group-item-action bg-dark {{ request_url_is(config("admin_path")."admin-menu*") ? "active": null }}" href="{{ admin_url('admin-menu') }}"><i data-feather="menu"></i> Menu Management</a>
             <a class="list-group-item list-group-item-action bg-dark {{ request_url_is(config("admin_path")."setting*") ? "active": null }}" href="{{ admin_url('setting') }}"><i data-feather="settings"></i> Setting</a>
+            <a class="list-group-item list-group-item-action bg-dark {{ request_url_is(config("admin_path")."backup*") ? "active": null }}" href="{{ admin_url('backup') }}"><i data-feather="download"></i> Backup Center</a>
             @endif
 
         </div>

@@ -1,0 +1,56 @@
+@extends("layout")
+@section("content")
+
+
+    <div class="row">
+        <div class="col-md-2"></div>
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">{{ $page_heading }}</h4>
+                    <p class="card-subtitle text-muted"> Complete the form data bellow:
+                    </p>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">The backup database is only support mysql database for now. Backup process maybe take a long time for large files. For Save Root Dir means the backup file save to project root directory.</div>
+
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Backup</th>
+                                <th width="50%">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Database Only</td>
+                                <td style="white-space: nowrap">
+                                    <a href="{{ admin_url('backup/database?mode=save') }}" class="btn btn-primary"><i data-feather="save"></i> Save Root Dir</a>
+                                    <a href="{{ admin_url('backup/database?mode=download') }}" class="btn btn-primary"><i data-feather="download"></i> Download Local</a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Script Only</td>
+                                <td style="white-space: nowrap">
+                                    <a href="{{ admin_url('backup/script?mode=save') }}" class="btn btn-primary"><i data-feather="save"></i> Save Root Dir</a>
+                                    <a href="{{ admin_url('backup/script?mode=download') }}" class="btn btn-primary"><i data-feather="download"></i> Download Local</a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Full (Script + Database)</td>
+                                <td style="white-space: nowrap">
+                                    <a href="{{ admin_url('backup/web?mode=save') }}" class="btn btn-primary"><i data-feather="save"></i> Save Root Dir</a>
+                                    <a href="{{ admin_url('backup/web?mode=download') }}" class="btn btn-primary"><i data-feather="download"></i> Download Local</a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- end card-body-->
+            </div>
+            <!-- end card -->
+        </div>
+        <div class="col-md-2"></div>
+    </div>
+
+@endsection
