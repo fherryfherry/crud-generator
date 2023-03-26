@@ -28,6 +28,7 @@ class Crud
             $this->warning("Argument --name is required");
             return false;
         }
+        $path = $this->getArgument($arguments,"path");
 
         $browseColumns = $this->getArgument($arguments,"browseColumns");
         $tableDetail = $this->getArgument($arguments,"tableDetail");
@@ -41,7 +42,7 @@ class Crud
         $alias['name_field'] = CrudHelper::nameField($table);
         $alias['view'] = $table;
         $alias['model_assign'] = $this->modelAssign($table);
-        $alias['module_path'] = $table;
+        $alias['module_path'] = ($path)?:$table;
         $alias['th_list'] = $this->thList($table,$browseColumns);
         $alias['td_list'] = $this->tdList($table,$browseColumns);
         $alias['form_group'] = $this->formGroup($table);
