@@ -3,7 +3,7 @@
   "description": "CRUD Generator for PHP Super Framework",
   "type": "library",
   "require": {
-    "php": "7.3.*|7.4.*|8.0.*",
+    "php": "^7.2|^8.0",
     "ext-json": "*",
     "ext-pdo": "*",
     "ext-openssl": "*",
